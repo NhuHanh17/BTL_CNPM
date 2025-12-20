@@ -1,0 +1,81 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    <title>Phòng hát</title>
+{% endblock %}
+
+{% block content %}
+    <div class="quick-search-bar">
+        <div class="container">
+            <form method="GET"  class="row g-2 align-items-center justify-content-center" >
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-calendar-event"></i></span>
+                        <input type="datetime-local" name="date" class="form-control bg-dark text-white border-secondary" value="{{ date }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary px-2">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+                    <input type="time" name="end" class="form-control bg-dark text-white border-secondary ps-2" value="{{ end }}">
+                </div>
+            </div>
+                
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-people"></i></span>
+                        <select name="capacity" class="form-select bg-dark text-white border-secondary">
+                           {% for c in [5, 10, 15] %}
+                                <option value="{{ c }}" {% if capacity|int == c %}selected{% endif %}>
+                                    {{ c }} Người
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-info w-100 fw-bold">Tìm phòng</button>
+                </div>
+            
+            </form>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row g-4">
+            
+          
+
+            <div class="col-lg-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-white fw-bold m-0">Kết quả phù hợp nhất</h3>
+                    <span class="text-white-50 small">
+                        Tìm thấy <strong class="text-white">{{ count }}</strong> phòng
+                    </span>
+            </div>
+
+                {% block room_cards %}
+                    {% include 'partials/room_card.html' %}
+                {% endblock %}
+
+                {% block order_room_modal %}
+                    {% include 'partials/order_room.html' %}
+                {% endblock %}
+            </div>
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled"><a class="page-link bg-dark border-secondary text-secondary" href="#">Trước</a></li>
+                        <li class="page-item active"><a class="page-link bg-info border-info text-white" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">Sau</a></li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

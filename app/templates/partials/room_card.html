@@ -1,0 +1,58 @@
+{% if not rooms %}
+<div class="col-12 text-center py-5">
+    <h3 class="text-white-50">Không tìm thấy phòng phù hợp!</h3>
+</div>
+{% endif %}
+
+<div class="row g-4 ">
+  {% for r, r_type, r_price in rooms %}
+  <div class="col-md-6 col-xl-3">
+    <div class="room-card-item">
+      <div class="room-img-wrapper">
+        <img src="{{ r.image }}" class="room-img" alt="{{ r.name }}" />
+        <span class="badge-type"
+          ><i class="bi bi-crown-fill text-warning"></i>{{ r_type }}</span
+        >
+      </div>
+      <div class="room-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="text-white fw-bold mb-0">{{ r.name }}</h5>
+        </div>
+
+        {% if r.status.name == 'AVAILABLE' %}
+        <div class="text-success small mb-3">
+          <span class="status-dot st-avail"></span> Còn trống giờ này
+        </div>
+        {% else %}
+        <div class="text-danger small mb-3">
+          <span class="status-dot bi bi-x-circle"></span> Đã được đặt
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <span class="facility-icon"
+            ><i class="bi bi-people"></i>{{ r_type.max_capacity }} Người</span
+          ><br />
+        </div>
+
+        <div class="mt-auto">
+          <div class="d-flex justify-content-between align-items-end mb-2">
+            <span class="room-price"
+              >{{ "{:,.0f}".format(r_price.price_per_hour) }} VNĐ<small
+                class="fs-6 text-secondary"
+                >/h</small
+              ></span
+            >
+          </div>
+          <div class="d-flex gap-2">
+            {% if r.status.name == 'AVAILABLE' %}
+            <button onclick="openBookingModal({{ r.id }}, '{{ r.name }}')" class="btn-book">ĐẶT NGAY</button>
+            {% endif %}
+            <button class="btn-info">XEM CHI TIẾT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,63 @@
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container-fluid px-4">
+
+    <a class="navbar-brand brand-text" href="/">
+      KARAOKE <span class="brand-highlight">STAR</span>
+    </a>
+
+    <button
+      class="navbar-toggler bg-secondary"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom " href="/">Trang chủ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="/room">Phòng hát</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="/menu">Menu & Dịch vụ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="/about">Giới thiệu</a>
+        </li>
+      </ul>
+
+      {% if current_user.is_authenticated %}
+      <div class="dropdown">
+                    <a href="/me" class="user-dropdown-toggle dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ current_user.avatar }}" class="user-avatar" alt="Avatar">
+                        <span class="fw-bold d-none d-md-inline">{{ current_user.username }}</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-dark-custom dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <h6 class="dropdown-header text-uppercase small text-secondary">Tài khoản</h6>
+                        </li>
+                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person-circle me-2"></i> Hồ sơ cá nhân</a></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li>
+                            <a class="dropdown-item text-danger fw-bold" href="/logout">
+                                <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+      {% else %}
+        <div class="d-flex">
+          <a href="/login"><button class="btn btn-pill btn-login-custom me-3">Đăng nhập</button></a>
+          <a href="/register"><button class="btn btn-pill btn-register-custom">Đăng ký</button></a>
+        </div>
+
+      {% endif %}
+    </div>
+  </div>
+</nav>

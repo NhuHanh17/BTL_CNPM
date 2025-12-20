@@ -1,0 +1,648 @@
+:root {
+  /* Colors */
+  --neon-pink: #ff0099;
+  --neon-blue: #00f3ff;
+  --neon-green: #00d26a;
+  --neon-red: #ff3e3e;
+  --bg-dark: #0f0f13;
+  --card-bg: #1a1a20;
+  --text-gray: #e0e0e0;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(90deg, #8a2be2 0%, #ff00cc 100%);
+
+  /* Effects */
+  --glass-bg: rgba(26, 26, 32, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background-color: var(--bg-dark);
+  font-family: "Segoe UI";
+  color: var(--text-gray);
+}
+
+
+.navbar-custom {
+  background-color: #110b29;
+  padding: 15px 0;
+  border-bottom: 1px solid #3d2c5e;
+}
+
+.brand-text {
+  font-family: "Arial", sans-serif;
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: white !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.brand-highlight {
+  color: #ff00cc;
+}
+
+.nav-link-custom {
+  color: var(--text-gray) !important;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 15px;
+  transition: color 0.3s ease;
+}
+
+.nav-link-custom:hover {
+  color: #ff00cc !important;
+}
+
+.btn-pill {
+  border-radius: 50px;
+  padding: 8px 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+/* Neon Outline Button (Login) */
+.btn-login-custom {
+  background: transparent;
+  border: 2px solid #ff00cc;
+  color: #ff00cc;
+  margin-right: 10px;
+}
+
+.btn-login-custom:hover {
+  background-color: rgba(255, 0, 204, 0.1);
+  color: #ff33d1;
+}
+
+/* Gradient Button (Register/Submit) */
+.btn-register-custom,
+.btn-auth-submit,
+.btn-login-submit {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  border-radius: 50px;
+  font-weight: 700;
+  transition: transform 0.2s, box-shadow 0.3s, opacity 0.3s;
+}
+
+/* Submit buttons specific sizing */
+.btn-auth-submit,
+.btn-login-submit {
+  padding: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-register-custom:hover,
+.btn-auth-submit:hover,
+.btn-login-submit:hover {
+  opacity: 0.95;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 0, 204, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-auth-submit:active {
+  transform: translateY(0);
+}
+
+/* Neon Solid Button (General) */
+.btn-neon {
+  background-color: var(--neon-pink);
+  color: white;
+  font-weight: 600;
+  border: none;
+  transition: 0.3s;
+}
+
+.btn-neon:hover {
+  background-color: #cc007a;
+  color: white;
+  box-shadow: 0 0 15px var(--neon-pink);
+}
+
+.form-control,
+.input-group-text {
+  background-color: #110b1d !important;
+  border: 1px solid #333 !important;
+  color: white !important;
+}
+
+.form-control {
+  padding: 12px 15px; /* Chuẩn hóa padding lớn hơn cho dễ bấm */
+  font-size: 0.95rem;
+}
+
+.input-group-text {
+  background-color: #15151a !important; /* Icon background hơi sáng hơn chút */
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+}
+
+.form-control:focus {
+  background-color: #110b1d;
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 204, 0.15) !important;
+  z-index: 3;
+}
+
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://images.unsplash.com/photo-1595180327341-2b0e6e768393?q=80&w=1974&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  padding: 80px 0;
+  border-bottom: 3px solid var(--neon-blue);
+}
+
+.search-box {
+  background: rgba(26, 26, 32, 0.9);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid #444;
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+}
+
+/* Shared Auth Card Styles */
+.login-card,
+.auth-card {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.login-body,
+.auth-body {
+  min-height: 85vh;
+  padding: 60px 0;
+  display: flex;
+  align-items: center;
+}
+
+.room-card {
+  background-color: var(--card-bg);
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.user-dropdown-toggle {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 15px;
+  border-radius: 30px;
+  transition: 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.user-dropdown-toggle:hover,
+.user-dropdown-toggle.show {
+  background-color: rgba(255, 0, 204, 0.15);
+  border-color: #ff00cc;
+  color: white;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff00cc;
+}
+
+.dropdown-menu-dark-custom {
+  background-color: var(--card-bg);
+  border: 1px solid #444;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-top: 10px;
+}
+
+.dropdown-item {
+  color: #ccc;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 0, 204, 0.1);
+  color: #ff00cc;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: rgba(255, 62, 62, 0.1);
+  color: var(--neon-red);
+}
+
+.badge-status-ok {
+  background-color: var(--neon-green);
+  color: #000;
+}
+
+.badge-status-full {
+  background-color: var(--neon-red);
+  color: white;
+}
+
+.price-tag {
+  color: var(--neon-blue);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.text-neon-pink {
+  color: var(--neon-pink);
+}
+.text-neon-pink:hover {
+  color: #ff66e0;
+}
+
+.quick-search-bar {
+  background: rgba(26, 26, 32, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #333;
+  padding: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  justify-content: center;
+}
+
+/* 2. SIDEBAR BỘ LỌC */
+.filter-sidebar {
+  background-color: var(--card-bg);
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.filter-group {
+  margin-bottom: 25px;
+  border-bottom: 1px solid #2a2a30;
+  padding-bottom: 20px;
+}
+.filter-group:last-child {
+  border-bottom: none;
+}
+.filter-title {
+  color: white;
+  font-weight: 700;
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+
+/* Custom Checkbox */
+.form-check-input {
+  background-color: #110b1d;
+  border-color: #444;
+}
+.form-check-input:checked {
+  background-color: var(--neon-pink);
+  border-color: var(--neon-pink);
+}
+
+/* 3. ROOM CARD (THẺ PHÒNG) */
+.room-card-item {
+  background-color: var(--card-bg);
+  border: 1px solid #333;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card-item:hover {
+  transform: translateY(-5px);
+  border-color: #555;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.room-img-wrapper {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+.room-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.5s;
+}
+.room-card-item:hover .room-img {
+  transform: scale(1.1);
+}
+
+.badge-type {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1px solid var(--neon-blue);
+}
+
+.room-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-price {
+  color: var(--neon-blue);
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.facility-icon {
+  color: #888;
+  font-size: 0.9rem;
+  margin-right: 10px;
+}
+.facility-icon i {
+  color: var(--neon-pink);
+  margin-right: 4px;
+}
+
+.btn-book {
+  background: var(--neon-pink);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: 0.3s;
+  margin-top: auto;
+}
+.btn-book:hover {
+  background: #d10080;
+  box-shadow: 0 0 15px rgba(255, 0, 153, 0.4);
+  color: white;
+}
+
+/* Trạng thái */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+.st-avail {
+  background-color: var(--neon-green);
+  box-shadow: 0 0 5px var(--neon-green);
+}
+.st-full {
+  background-color: #ff3e3e;
+}
+
+.btn-info {
+  background: var(--neon-red);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: 0.3s;
+  margin-top: auto;
+}
+
+/* Style cho Card Menu */
+.menu-section {
+    background-color: #000; /* Trùng màu nền web của bạn */
+    min-height: 80vh; /* Đảm bảo độ cao để đẩy footer xuống dưới */
+    padding: 50px 0;
+}
+
+.card-menu {
+    background-color: #1a1a1a; /* Màu nền thẻ sáng hơn nền web 1 chút */
+    border: 1px solid #333;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.card-menu:hover {
+    transform: translateY(-5px); /* Bay lên nhẹ khi trỏ chuột */
+    border-color: #d63384; /* Viền phát sáng màu hồng STAR */
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover; /* Giữ ảnh không bị méo */
+    width: 100%;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.menu-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Cắt chữ nếu tên quá dài */
+}
+
+.menu-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d63384; /* Màu hồng giống logo STAR */
+}
+
+.btn-add {
+    background-color: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    background-color: #d63384;
+    border-color: #d63384;
+    color: white;
+}
+    /* 1. Hero Banner: Ảnh nền lớn đầu trang */
+    .about-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                    url('https://images.unsplash.com/photo-1598802952870-07d0f99b3869?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: white;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: #ddd;
+        font-weight: 300;
+    }
+
+    /* 2. Text Highlight */
+    .text-highlight {
+        color: #d63384; /* Màu hồng thương hiệu */
+        font-weight: bold;
+    }
+
+    /* 3. Feature Box (Các ô tính năng) */
+    .feature-box {
+        background-color: #1a1a1a;
+        padding: 40px 30px;
+        border-radius: 15px;
+        text-align: center;
+        border: 1px solid #333;
+        transition: transform 0.3s;
+        height: 100%;
+    }
+    
+    .feature-box:hover {
+        transform: translateY(-10px);
+        border-color: #d63384;
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        color: #d63384;
+        margin-bottom: 20px;
+    }
+
+    /* 4. Thống kê (Numbers) */
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    /* 1. Nền và thẻ bao quanh */
+    .profile-section {
+        background-color: #000;
+        min-height: 85vh;
+        padding: 50px 0;
+    }
+
+    .card-dark {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 15px;
+        color: #fff;
+    }
+
+    /* 2. Thẻ VIP (Member Card) - Điểm nhấn */
+    .vip-card {
+        background: linear-gradient(135deg, #d63384 0%, #700b39 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(214, 51, 132, 0.4);
+    }
+    
+    .vip-card::after {
+        content: "VIP";
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        font-size: 5rem;
+        font-weight: 900;
+        opacity: 0.1;
+        font-style: italic;
+    }
+
+    .avatar-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 4px solid #1a1a1a;
+        overflow: hidden;
+        margin: -50px auto 15px; /* Đẩy lên đè lên thẻ VIP */
+        position: relative;
+        z-index: 2;
+        background: #000;
+    }
+    
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* 3. Form và Input tối màu */
+    .form-control-dark {
+        background-color: #2c2c2c;
+        border: 1px solid #444;
+        color: #fff;
+    }
+    .form-control-dark:focus {
+        background-color: #2c2c2c;
+        color: #fff;
+        border-color: #d63384;
+        box-shadow: 0 0 0 0.25rem rgba(214, 51, 132, 0.25);
+    }
+    .form-label {
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+
+    /* 4. Tabs Navigation */
+    .nav-tabs {
+        border-bottom: 1px solid #333;
+    }
+    .nav-tabs .nav-link {
+        color: #aaa;
+        border: none;
+        padding-bottom: 15px;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: transparent;
+        color: #d63384;
+        border-bottom: 2px solid #d63384;
+        font-weight: bold;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #fff;
+        border-color: transparent;
+    }

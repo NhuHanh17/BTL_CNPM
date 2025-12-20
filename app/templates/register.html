@@ -1,0 +1,91 @@
+{% extends 'layout/base.html'%}
+
+{% block title%}
+    <title>Register</title>
+{% endblock %}
+
+{% block content %}
+<section class="auth-body d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-6 col-xl-5">         
+                <div class="card auth-card p-4 p-md-5"> 
+
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-white">Tạo tài khoản mới</h2>
+                    </div>
+                    {% if err_msg: %}
+                        <div class="alert alert-danger text-center">{{ err_msg}}</div>
+                    {% endif %}
+                    <form action="/register" method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-light small">Họ và tên</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">
+                                    <i class="bi bi-person-badge"></i>
+                                </span>
+                                <input type="text" class="form-control" name="fullname" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-light small">Số điện thoại</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </span>
+                                <input type="tel" class="form-control" name="phone_number" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 input-group-custom">
+                            <label class="form-label text-light">Tài khoản</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <input type="text" class="form-control" placeholder="Số điện thoại" name="username" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-light small">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" placeholder="Nhập mật khẩu" name="password" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-light small">Xác nhận mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-secondary">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" placeholder="Nhập lại mật khẩu bên trên" name="confirm" required>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input bg-dark border-secondary" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label text-secondary small" for="agreeTerms">
+                                Tôi đồng ý với <a href="#" class="text-neon-pink text-decoration-none">Điều khoản dịch vụ</a> & Chính sách bảo mật.
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-auth-submit w-100 mb-3">ĐĂNG KÝ TÀI KHOẢN</button>
+
+                        <div class="text-center mt-4">
+                            <span class="text-secondary">Bạn đã có tài khoản?</span>
+                            <a href="/login" class="fw-bold text-white text-decoration-none ms-1">Đăng nhập ngay</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

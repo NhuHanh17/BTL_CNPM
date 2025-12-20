@@ -1,0 +1,95 @@
+{% extends 'layout/base.html' %}
+{% block title %}
+    <title>About Us</title>
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <div class="container">
+        <h1 class="hero-title">Câu Chuyện Của <span class="text-highlight">STAR</span></h1>
+        <p class="hero-subtitle mt-3">Hơn cả một phòng hát - Đó là sân khấu của riêng bạn</p>
+    </div>
+</section>
+
+<section class="container mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h6 class="text-uppercase text-secondary ls-2">Về chúng tôi</h6>
+            <h2 class="text-white fw-bold display-5 mb-4">Đánh thức đam mê <br>ca hát trong bạn</h2>
+            <p class="text-secondary fs-5">
+                Thành lập từ năm 2026, <span class="text-white">Karaoke Star</span> ra đời với sứ mệnh mang lại trải nghiệm âm nhạc đỉnh cao nhất tại TP.HCM. 
+            </p>
+            <p class="text-secondary">
+                Chúng tôi không chỉ cung cấp phòng hát, chúng tôi cung cấp một không gian nơi cảm xúc được thăng hoa. Với hệ thống âm thanh 
+                <span class="text-highlight">SR Italy</span> nhập khẩu 100% và không gian cách âm tuyệt đối, mỗi khoảnh khắc của bạn đều trở nên trọn vẹn.
+            </p>
+            
+            <div class="mt-4">
+                <a href="/room" class="btn btn-outline-light px-4 py-2 rounded-pill">Đặt phòng ngay</a>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="position-relative">
+                <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&q=80" alt="Không gian Karaoke" class="img-fluid rounded-4 shadow-lg border border-secondary">
+                <div class="position-absolute bg-black p-3 rounded-3 border border-danger shadow" style="bottom: -20px; left: -20px;">
+                    <span class="text-white fw-bold">Since</span> <span class="text-highlight fw-bold fs-4">2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5" style="background-color: #0d0d0d;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="text-white fw-bold">Tại Sao Chọn <span class="text-highlight">Star?</span></h3>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <i class="bi bi-music-note-beamed feature-icon"></i>
+                    <h4 class="text-white mb-3">Âm Thanh Đỉnh Cao</h4>
+                    <p class="text-secondary">Hệ thống loa SR Italy nhập khẩu, mic không dây cao cấp lọc tạp âm, mang lại giọng hát trong trẻo nhất.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <i class="bi bi-palette-fill feature-icon"></i>
+                    <h4 class="text-white mb-3">Không Gian Độc Bản</h4>
+                    <p class="text-secondary">50 phòng hát với 50 chủ đề thiết kế khác nhau: Cyberpunk, Hoàng Gia, Cổ Điển, Hiện Đại...</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <i class="bi bi-shield-check feature-icon"></i>
+                    <h4 class="text-white mb-3">Riêng Tư Tuyệt Đối</h4>
+                    <p class="text-secondary">Hệ thống cách âm 3 lớp tiêu chuẩn quốc tế. Bảo mật thông tin khách hàng tuyệt đối.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row text-center border-top border-secondary pt-5">
+        <div class="col-4">
+            <div class="stat-number text-highlight">20+</div>
+            <div class="text-secondary">Phòng hát</div>
+        </div>
+        <div class="col-4">
+            <div class="stat-number text-highlight">0</div>
+            <div class="text-secondary">Khách hàng hài lòng</div>
+        </div>
+        <div class="col-4">
+            <div class="stat-number text-highlight">24/7</div>
+            <div class="text-secondary">Hỗ trợ đặt phòng</div>
+        </div>
+    </div>
+</section>
+
+{% endblock%}

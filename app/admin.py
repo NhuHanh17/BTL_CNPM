@@ -17,15 +17,15 @@ class LogoutView(ModelView):
     def index(self):
         logout_user()
         return redirect()
-    
-    def is_accessible(self):
+
+    def is_accessible(self) -> bool:
         return current_user.is_authenticated
 
 
 admin = Admin(app=app, name='Karaoke Admin')
 
 
-admin.add_view(AdminView(User, db.session))
-admin.add_view(AdminView(Room, db.session))
-admin.add_view(AdminView(PriceConfig, db.session))
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Room, db.session))
+admin.add_view(ModelView(PriceConfig, db.session))
 # admin.add_view(LogoutView(name='Đăng xuất'))

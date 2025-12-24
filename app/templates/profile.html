@@ -6,6 +6,14 @@
 
 {% block content %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
 <div class="profile-section">
     <div class="container">
         <div class="row g-4">
@@ -19,27 +27,23 @@
                     
                     <div class="card-body card-dark text-center mt-n4 pt-0">
                         <div class="avatar-container">
-                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&q=80" alt="User" class="avatar-img">
+                            <img src="{{ current_user.avatar }}" alt="{{ current_user}}" class="avatar-img">
                         </div>
                         
-                        <h4 class="fw-bold mt-2">Trần Thị Như Hạnh</h4>
-                        <p class="text-secondary mb-3">@han_kute_2005</p>
+                        <h4 class="fw-bold mt-2">{{ current_user.fullname }}</h4>
+                        <p class="text-secondary mb-3">@{{ current_user.username }}</p>
                         
-                        <div class="d-flex justify-content-center gap-2 mb-4">
-                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i> Gold Member</span>
-                            <span class="badge bg-dark border border-secondary">1,250 Điểm</span>
-                        </div>
 
                         <hr class="border-secondary">
                         
                         <div class="row text-center">
                             <div class="col-6 border-end border-secondary">
-                                <h5 class="mb-0 fw-bold">12</h5>
-                                <small class="text-secondary">Lần hát</small>
+                                <h5 class="mb-0 fw-bold">{{ count }}</h5>
+                                <small class="text-secondary">Số booking</small>
                             </div>
                             <div class="col-6">
-                                <h5 class="mb-0 fw-bold">45h</h5>
-                                <small class="text-secondary">Giờ bay</small>
+                                <h5 class="mb-0 fw-bold">0</h5>
+                                <small class="text-secondary">Đã hát</small>
                             </div>
                         </div>
                     </div>
@@ -70,11 +74,11 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label">Họ và tên</label>
-                                            <input type="text" class="form-control form-control-dark" >
+                                            <input type="text" class="form-control form-control-dark" value="{{ current_user.fullname }}" >
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Số điện thoại</label>
-                                            <input type="text" class="form-control form-control-dark" readonly>
+                                            <input type="text" class="form-control form-control-dark" value="{{ current_user.phone_number }}" readonly>
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label">Avatar</label>
@@ -101,45 +105,44 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {% for history in histories %}
                                             <tr>
-                                                <td>#BK9021</td>
-                                                <td>20/12/2025 <br><small class="text-secondary">19:30</small></td>
-                                                <td>P.101 (VIP)</td>
-                                                <td class="text-warning fw-bold">1.250.000đ</td>
-                                                <td><span class="badge bg-success bg-opacity-25 text-success">Hoàn thành</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#BK8812</td>
-                                                <td>15/12/2025 <br><small class="text-secondary">20:00</small></td>
-                                                <td>P.205</td>
-                                                <td class="text-warning fw-bold">850.000đ</td>
-                                                <td><span class="badge bg-success bg-opacity-25 text-success">Hoàn thành</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>#BK7100</td>
-                                                <td>01/12/2025</td>
-                                                <td>P.303</td>
-                                                <td class="text-secondary">0đ</td>
-                                                <td><span class="badge bg-danger bg-opacity-25 text-danger">Đã hủy</span></td>
-                                            </tr>
+                                                <td>{{ history.id }}</td>
+                                                <td>{{ history.start_datetime.strftime('%d/%m/%Y') }} <br><small class="text-secondary">{{ history.start_datetime.strftime('%H:%M') }}</small></td>
+                                                <td>{{ history.room.name }}</td>
+                                                <td class="text-warning fw-bold">{{ "{:,}".format(history.total_price) }}đ</td>
+                                                <td>
+                                                    {% if history.status == 'completed' %}
+                                                    <span class="badge bg-success bg-opacity-25 text-success">Hoàn thành</span>
+                                                    {% elif history.status == 'cancelled' %}
+                                                    <span class="badge bg-danger bg-opacity-25 text-danger">Đã hủy</span>
+                                                    {% else %}
+                                                    <span class="badge bg-warning bg-opacity-25 text-warning">Đang chờ</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>   
+                                            {% endfor %}            
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
                             <div class="tab-pane fade" id="password">
-                                <form>
+                                <form method="POST,GET" action="/change-password">
+                                     {% if err_msg %}
+                                        <div class="alert alert-danger">{{ err_msg }}</div>
+                                    {% endif %}
                                     <div class="mb-3">
                                         <label class="form-label">Mật khẩu hiện tại</label>
-                                        <input type="password" class="form-control form-control-dark">
+                                        <input type="password" class="form-control form-control-dark" name="old_password" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Mật khẩu mới</label>
-                                        <input type="password" class="form-control form-control-dark">
+                                        <input type="password" class="form-control form-control-dark" name="new_password" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Nhập lại mật khẩu mới</label>
-                                        <input type="password" class="form-control form-control-dark">
+                                        <input type="password" class="form-control form-control-dark" name="confirm_password">
                                     </div>
                                     <button class="btn btn-outline-light w-100 mt-2">Cập nhật mật khẩu</button>
                                 </form>

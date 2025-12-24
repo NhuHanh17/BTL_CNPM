@@ -7,29 +7,45 @@
 {% block content %}
 <div class="menu-section">
     <div class="container">
-         <a href="#" class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 "><i>Tất cả</i></a>
-        {% for c in categories %}
-            <a href="#" class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 ">
-                <i>{{ c.name }}</i>
+        <div class="mb-4">
+            <a href="/menu" class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 {% if not request.args.get('category_id') %}active-pink{% endif %}">
+                <i>Tất cả</i>
             </a>
-        {% endfor %}  
-        <div class="d-flex justify-content-between align-items-center">
-            <h3 class="fw-bold"><i class="bi bi-cup-straw me-2 text-warning "></i>Thực Đơn</h3>
+            
+            {% for c in categories %}
+                <a href="/menu?category_id={{ c.id }}" 
+                   class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 {% if request.args.get('category_id')|int == c.id %}active-pink{% endif %}">
+                    <i>{{ c.name }}</i>
+                </a>
+            {% endfor %}  
         </div>
 
-        <div class="row g-4">
-            <div class="col-6 col-md-3">
-                <div class="card card-menu h-100">
-                    <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=500&q=80" class="card-img-top" alt="Cà phê">
-                    <div class="card-body d-flex flex-column">
-                        <div class="menu-title">Combo Trái Cây Lớn</div>
-                        <div class="d-flex justify-content-between align-items-end mt-auto">
-                            <span class="menu-price">150.000đ</span>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold"><i class="bi bi-cup-straw me-2 text-warning"></i>Thực Đơn</h3>
+        </div>
+
+        {% if not services_items %}
+            <p class="text-secondary mb-4">Hiện chưa có món ăn nào trong mục này.</p>
+        {% else %}
+            
+            <div class="row g-4">
+                {% for d, s in services_items %}
+                    <div class="col-6 col-md-3 animate__animated animate__fadeIn">
+                        <div class="card card-menu h-100 bg-dark text-white border-secondary">
+                            <img src="{{ s.image }}" class="card-img-top" alt="{{ s.name }}" style="height: 180px; object-fit: cover;">
+                            
+                            <div class="card-body d-flex flex-column">
+                                <div class="menu-title fw-bold mb-2">{{ s.name }}</div>
+                                <div class="d-flex justify-content-between align-items-end mt-auto">
+                                    <span class="menu-price text-info fw-bold">{{ "{:,.0f}".format(s.price) }} VNĐ</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                {% endfor %}
+            </div> 
+            {% endif %}
     </div>
 </div>
+
 {% endblock %}

@@ -57,9 +57,9 @@
                             <div class="d-flex justify-content-between align-items-end mt-3">
                                 <div>
                                     <small class="text-secondary d-block">Giá giờ:</small>
-                                    <span class="price-tag">{{ r_price.price_per_hour }} VNĐ<small class="fs-6 text-secondary">/h</small></span>
+                                    <span class="price-tag">{{ "{:,.0f}".format(r_price.price_per_hour) }} VNĐ<small class="fs-6 text-secondary">/h</small></span>
                                 </div>
-                            <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="openBookingModal({{ r.id }}, '{{ r.name }}')">Đặt ngay</button>
+                               <a href="/booking?room_id={{ r.id }}"> <button class="btn btn-sm btn-outline-info"">ĐẶT NGAY</button></a>
                             </div>
                         {% else %}
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -72,10 +72,8 @@
                     </div>
                 </div>
             </div>
-            {% endfor %}
-                 {% block order_room  %}
-                {% include 'partials/order_room.html' %}
-            {% endblock %}
+            {% endfor%}
+
         </div>
     </div>
 {% endblock %}

@@ -1,37 +1,180 @@
 {
   "room_type": [
-    { "id": 1, "name": "Phòng Thường", "max_capacity": 5 },
-    { "id": 2, "name": "Phòng VIP", "max_capacity": 10 },
-    { "id": 3, "name": "Super Party", "max_capacity": 15 }
+    {
+      "id": 1,
+      "name": "Phòng Thường",
+      "max_capacity": 5
+    },
+    {
+      "id": 2,
+      "name": "Phòng VIP",
+      "max_capacity": 10
+    },
+    {
+      "id": 3,
+      "name": "Super Party",
+      "max_capacity": 15
+    }
   ],
-
   "room": [
-    { "id": 1, "name": "Phòng N01", "note": "Gần lối thoát hiểm", "type_id": 1 },
-    { "id": 2, "name": "Phòng V01", "note": "Có dàn âm thanh mới", "type_id": 2 },
-    { "id": 3, "name": "Phòng S01",  "note": "Rộng rãi, thoáng mát", "type_id": 3, "image": "https://res.cloudinary.com/dinusoo6h/image/upload/v1766180719/photo-1566737236500-c8ac43014a67_d2jmtc.jpg" }
+    {
+      "id": 1,
+      "name": "Phòng N01",
+      "note": "Gần lối thoát hiểm",
+      "type_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Phòng V01",
+      "note": "Có dàn âm thanh mới",
+      "type_id": 2
+    },
+    {
+      "id": 3,
+      "name": "Phòng S01",
+      "note": "Rộng rãi, thoáng mát",
+      "type_id": 3,
+      "image": "https://res.cloudinary.com/dinusoo6h/image/upload/v1766180719/photo-1566737236500-c8ac43014a67_d2jmtc.jpg"
+    }
   ],
 
-  "category": [
-    { "id": 1, "name": "Đồ uống" },
-    { "id": 2, "name": "Thức ăn" }
+  "categories": [
+    {
+      "id": 1,
+      "name": "Đồ uống"
+    },
+    {
+      "id": 2,
+      "name": "Thức ăn nhanh"
+    },
+    {
+      "id": 3,
+      "name": "Trái cây & Khác"
+    }
   ],
-
-  "services_item": [
-    { "id": 1, "name": "Bia Tiger", "price": 25000, "unit": "Lon", "category_id": 1 },
-    { "id": 2, "name": "Trái cây dĩa", "price": 150000, "unit": "Phần", "category_id": 2 }
+  "services_items": [
+    {
+      "id": 1,
+      "name": "Bia Tiger",
+      "price": 25000.0,
+      "unit": "Lon",
+      "category_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Nước suối Aquafina",
+      "price": 10000.0,
+      "unit": "Chai",
+      "category_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Coca Cola",
+      "price": 15000.0,
+      "unit": "Lon",
+      "category_id": 1
+    },
+    {
+      "id": 4,
+      "name": "Snack khoai tây",
+      "price": 20000.0,
+      "unit": "Gói",
+      "category_id": 2
+    },
+    {
+      "id": 5,
+      "name": "Mì xào bò",
+      "price": 55000.0,
+      "unit": "Dĩa",
+      "category_id": 2
+    },
+    {
+      "id": 6,
+      "name": "Trái cây thập cẩm",
+      "price": 120000.0,
+      "unit": "Dĩa",
+      "category_id": 3
+    },
+    {
+      "id": 7,
+      "name": "Khăn lạnh",
+      "price": 5000.0,
+      "unit": "Cái",
+      "category_id": 3
+    }
   ],
-
   "price_config": [
-  { "id": 1, "room_type_id": 1, "start_time": "08:00:00", "end_time": "17:00:00", "price_per_hour": 100000, "is_weekend": false },
-  { "id": 2, "room_type_id": 1, "start_time": "17:00:01", "end_time": "23:59:59", "price_per_hour": 150000, "is_weekend": false },
-  { "id": 3, "room_type_id": 1, "start_time": "08:00:00", "end_time": "23:59:59", "price_per_hour": 100000, "is_weekend": true },
-
-  { "id": 4, "room_type_id": 2, "start_time": "08:00:00", "end_time": "17:00:00", "price_per_hour": 200000, "is_weekend": false },
-  { "id": 5, "room_type_id": 2, "start_time": "17:00:01", "end_time": "23:59:59", "price_per_hour": 250000, "is_weekend": false },
-  { "id": 6, "room_type_id": 2, "start_time": "08:00:00", "end_time": "23:59:59", "price_per_hour": 150000, "is_weekend": true },
-
-  { "id": 7, "room_type_id": 3, "start_time": "08:00:00", "end_time": "17:00:00", "price_per_hour": 350000, "is_weekend": false },
-  { "id": 8, "room_type_id": 3, "start_time": "17:00:01", "end_time": "23:59:59", "price_per_hour": 450000, "is_weekend": false },
-  { "id": 9, "room_type_id": 3, "start_time": "08:00:00", "end_time": "23:59:59", "price_per_hour": 600000, "is_weekend": true }
-]
-} 
+    {
+      "id": 1,
+      "room_type_id": 1,
+      "start_time": "08:00:00",
+      "end_time": "17:00:00",
+      "price_per_hour": 100000,
+      "is_weekend": false
+    },
+    {
+      "id": 2,
+      "room_type_id": 1,
+      "start_time": "17:00:01",
+      "end_time": "23:59:59",
+      "price_per_hour": 150000,
+      "is_weekend": false
+    },
+    {
+      "id": 3,
+      "room_type_id": 1,
+      "start_time": "08:00:00",
+      "end_time": "23:59:59",
+      "price_per_hour": 200000,
+      "is_weekend": true
+    },
+    {
+      "id": 4,
+      "room_type_id": 2,
+      "start_time": "08:00:00",
+      "end_time": "17:00:00",
+      "price_per_hour": 200000,
+      "is_weekend": false
+    },
+    {
+      "id": 5,
+      "room_type_id": 2,
+      "start_time": "17:00:01",
+      "end_time": "23:59:59",
+      "price_per_hour": 250000,
+      "is_weekend": false
+    },
+    {
+      "id": 6,
+      "room_type_id": 2,
+      "start_time": "08:00:00",
+      "end_time": "23:59:59",
+      "price_per_hour": 350000,
+      "is_weekend": true
+    },
+    {
+      "id": 7,
+      "room_type_id": 3,
+      "start_time": "08:00:00",
+      "end_time": "17:00:00",
+      "price_per_hour": 350000,
+      "is_weekend": false
+    },
+    {
+      "id": 8,
+      "room_type_id": 3,
+      "start_time": "17:00:01",
+      "end_time": "23:59:59",
+      "price_per_hour": 450000,
+      "is_weekend": false
+    },
+    {
+      "id": 9,
+      "room_type_id": 3,
+      "start_time": "08:00:00",
+      "end_time": "23:59:59",
+      "price_per_hour": 600000,
+      "is_weekend": true
+    }
+  ]
+}

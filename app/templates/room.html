@@ -19,7 +19,7 @@
                     <span class="input-group-text bg-dark border-secondary text-secondary px-2">
                         <i class="bi bi-clock-history"></i>
                     </span>
-                    <input type="time" name="end" class="form-control bg-dark text-white border-secondary ps-2" value="{{ end }}">
+                   <input type="time" name="time" class="form-control ..." value="{{ end }}" step="60" required>
                 </div>
             </div>
                 
@@ -55,14 +55,11 @@
                         Tìm thấy <strong class="text-white">{{ count }}</strong> phòng
                     </span>
             </div>
-
+           
                 {% block room_cards %}
-                    {% include 'partials/room_card.html' %}
+                    {% include 'components/room_card.html' %}
                 {% endblock %}
-
-                {% block order_room_modal %}
-                    {% include 'partials/order_room.html' %}
-                {% endblock %}
+         
             </div>
                 <nav class="mt-5">
                     <ul class="pagination justify-content-center">

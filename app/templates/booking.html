@@ -1,0 +1,109 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% if err_msg %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ err_msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %} 
+
+{% if msg %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+<div class="booking-section py-5" style="background-color: #000; min-height: 100vh;">
+    <div class="container">
+        
+        <a href="/" class="text-white-50 text-decoration-none mb-4 d-inline-block">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại chọn phòng
+        </a>
+
+        <div class="row g-5">
+            
+            <div class="col-lg-4">
+                <div class="card bg-dark border-secondary text-white sticky-top" style="top: 20px;">
+                    <img src="{{ room.image }}" alt="{{ room.name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                        <input type="hidden" id="basePrice" value="{{ r_price.price_per_hour }}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3 class="fw-bold m-0">{{ room.name }}</h3>
+                            <span class="badge bg-warning text-dark">{{ room.room_type }}</span>
+                        </div>
+                        <p class="text-white-50 mb-3"><i class="bi bi-people me-2"></i>Sức chứa: {{ room.room_type }} người</p>
+                        
+                        <div class="border-top border-secondary pt-3">
+                            <small class="text-white-50">Đơn giá / giờ</small>
+                            <h3 class="text-info fw-bold" >{{ "{:,.0f}".format(r_price.price_per_hour) }} VNĐ</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="p-4 rounded-3" style="background-color: #1a1a1a; border: 1px solid #333;">
+                    <h4 class="fw-bold text-white mb-4 border-start border-4 border-danger ps-3">THÔNG TIN ĐẶT PHÒNG</h4>
+                    
+                    <form action="/booking" method="POST" id="bookingForm">
+                        <input type="hidden" name="room_id" value="{{ room.id }}">
+                        <input type="hidden" id="basePrice" value="{{ r_price.price_per_hour }}">
+
+                        <div class="mb-3">
+                            <label class="text-white-50 mb-1">Người đặt</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" 
+                                   value="{{ current_user.username }} " readonly>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="text-white-50 mb-1">Ngày hát</label>
+                                <input type="date" name="date" id="inputDate" class="form-control bg-dark text-white border-secondary" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-white-50 mb-1">Giờ bắt đầu</label>
+                                <input type="time" name="time" id="inputTime" class="form-control bg-dark text-white border-secondary" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="text-white-50 mb-1">Thời lượng (Tiếng)</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="adjustDuration(-1)">-</button>
+                                    <input type="number" name="duration" id="inputDuration" value="1" min="1" max="10" 
+                                           class="form-control bg-dark text-white border-secondary text-center fw-bold" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="adjustDuration(1)">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                    <label class="text-white-50 mb-1">
+                                        Số khách (Tối đa <strong class="text-warning">{{ r_type.max_capacity }}</strong>)
+                                    </label>
+                                    <input type="number" name="people" id="inputPeople" 
+                                        class="form-control bg-dark text-white border-secondary fw-bold" 
+                                        value="1" min="1" max="{{ r_type.max_capacity }}" required>
+                            </div>
+                        </div>
+
+                        <div class="bg-black p-3 rounded mb-4 d-flex justify-content-between align-items-center border border-secondary">
+                            <span class="text-white-50">TỔNG CỘNG TẠM TÍNH</span>
+                            <h2 class="text-danger fw-bold m-0" id="totalPrice" name="totalPrice">0</h2>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold fs-5 text-uppercase shadow-lg" 
+                                style="background: linear-gradient(45deg, #d63384, #fd7e14); border:none;">
+                            Xác nhận đặt phòng
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

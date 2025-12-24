@@ -10,3 +10,4 @@ app.secret_key = 'secret'
 
 db = SQLAlchemy(app=app)
 login = LoginManager(app=app)
+

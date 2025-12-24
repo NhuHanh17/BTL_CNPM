@@ -1,24 +1,30 @@
-// 1. Truyền ID phòng vào Modal khi click
-function openBookingModal(roomId, roomName) {
-    document.getElementById('modalRoomId').value = roomId;
-    document.getElementById('modalRoomName').innerText = roomName;
-    var myModal = new bootstrap.Modal(document.getElementById('bookingModal'));
-    myModal.show();
-}
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('inputDate').valueAsDate = new Date();
+        
+        let now = new Date();
+        let timeString = now.toTimeString().slice(0, 5); 
+        document.getElementById('inputTime').value = timeString;
 
-// 2. Gửi form bằng AJAX để không load lại trang
-document.getElementById('bookingForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    
-    const response = await fetch('/api/book-room', {
-        method: 'POST',
-        body: formData
+        calculateTotal();
     });
-    
-    const result = await response.json();
-    if(result.status === 'success') {
-        alert('Chúc mừng Han! ' + result.message);
-        location.reload(); // Load lại để cập nhật màu Badge trạng thái
+
+    function adjustDuration(delta) {
+        let input = document.getElementById('inputDuration');
+        let val = parseInt(input.value) || 0;
+        val += delta;
+        if (val < 1) val = 1;
+        if (val > 12) val = 12; 
+        input.value = val;
+        
+        calculateTotal(); 
     }
-};
+
+    function calculateTotal() {
+        let basePrice = parseInt(document.getElementById('basePrice').value);
+        let duration = parseInt(document.getElementById('inputDuration').value);
+        
+        let total = basePrice * duration;
+        
+        // Format tiền Việt
+        document.getElementById('totalPrice').innerText = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
+    }

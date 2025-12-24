@@ -7,7 +7,12 @@
 {% block content %}
 <div class="menu-section">
     <div class="container">
-
+         <a href="#" class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 "><i>Tất cả</i></a>
+        {% for c in categories %}
+            <a href="#" class="btn btn-outline-light rounded-pill border-secondary me-2 mb-2 px-3 ">
+                <i>{{ c.name }}</i>
+            </a>
+        {% endfor %}  
         <div class="d-flex justify-content-between align-items-center">
             <h3 class="fw-bold"><i class="bi bi-cup-straw me-2 text-warning "></i>Thực Đơn</h3>
         </div>

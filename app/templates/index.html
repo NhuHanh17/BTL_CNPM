@@ -49,14 +49,14 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title text-white">{{ r.name }}</h5>
-                        {% if r.status.name == 'AVAILABLE' and r_price.price_per_hour: %}
+                        {% if r.is_available == true and r_price.price_per_hour: %}
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="badge badge-status-ok px-2 py-1"><i class="bi bi-check-circle"></i> Còn trống</span>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-end mt-3">
                                 <div>
-                                    <small class="text-secondary d-block">Giá giờ:</small> 
+                                    <small class="text-secondary d-block">Giá giờ:</small>
                                     <span class="price-tag">{{ r_price.price_per_hour }} VNĐ<small class="fs-6 text-secondary">/h</small></span>
                                 </div>
                             <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="openBookingModal({{ r.id }}, '{{ r.name }}')">Đặt ngay</button>
@@ -72,12 +72,10 @@
                     </div>
                 </div>
             </div>
-             {% endfor %}
+            {% endfor %}
+                 {% block order_room  %}
+                {% include 'partials/order_room.html' %}
+            {% endblock %}
         </div>
     </div>
-    
-    {% block order_room  %}
-        {% include 'partials/order_room.html' %}
-    {% endblock %}
-
 {% endblock %}

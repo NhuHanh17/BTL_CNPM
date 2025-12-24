@@ -1,8 +1,10 @@
 {% if not rooms %}
+
 <div class="col-12 text-center py-5">
     <h3 class="text-white-50">Không tìm thấy phòng phù hợp!</h3>
 </div>
-{% endif %}
+
+{% else %}
 
 <div class="row g-4 ">
   {% for r, r_type, r_price in rooms %}
@@ -19,7 +21,7 @@
           <h5 class="text-white fw-bold mb-0">{{ r.name }}</h5>
         </div>
 
-        {% if r.status.name == 'AVAILABLE' %}
+        {% if r.is_available == true %}
         <div class="text-success small mb-3">
           <span class="status-dot st-avail"></span> Còn trống giờ này
         </div>
@@ -45,10 +47,9 @@
             >
           </div>
           <div class="d-flex gap-2">
-            {% if r.status.name == 'AVAILABLE' %}
+            {% if r.is_available == true %}
             <button onclick="openBookingModal({{ r.id }}, '{{ r.name }}')" class="btn-book">ĐẶT NGAY</button>
             {% endif %}
-            <button class="btn-info">XEM CHI TIẾT</button>
           </div>
         </div>
       </div>
@@ -56,3 +57,4 @@
   </div>
   {% endfor %}
 </div>
+{% endif %}

@@ -60,8 +60,6 @@ def register_process():
         return render_template('register.html', err_msg=str(ex))
 
 
-
-
 @app.route('/room')
 def room_view():
     capacity = request.args.get('capacity', '5') 
@@ -74,7 +72,6 @@ def room_view():
 
         date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M')
         search_time = date_obj.strftime('%H:%M:%S')
-
         rooms, count_rooms = dao.get_all_rooms_info(
             capacity=capacity, 
             date=date_obj, 
@@ -85,8 +82,6 @@ def room_view():
         print (ex)
         rooms, count_rooms = dao.get_all_rooms_info()
 
-    
-
     return render_template('room.html', rooms=rooms,
                            capacity=capacity,
                            date = date,
@@ -96,7 +91,8 @@ def room_view():
 
 @app.route('/menu')
 def menu_view():
-    return render_template('menu.html')
+    categories = dao.get_all_cate()
+    return render_template('menu.html', categories=categories)
 
 @app.route('/about')
 def about_view():

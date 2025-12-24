@@ -1,19 +1,22 @@
 from sqlalchemy import func
-from app.models import User, Customer, Room, RoomType, PriceConfig
+from app.models import User, Customer, Room, RoomType, PriceConfig, Category
 from app import app, db
 from sqlalchemy.exc import IntegrityError
 
-import cloudinary.uploader
+
 import hashlib
 from datetime import datetime
 
+def is_weekend_now():
+    return datetime.now().weekday() >= 5
 
 def get_all_rooms_info(capacity=None, date=None, end=None, page=None):
 
     query = db.session.query(Room, RoomType, PriceConfig).\
         join(RoomType, Room.type_id == RoomType.id).\
         join(PriceConfig, RoomType.id == PriceConfig.room_type_id).\
-        filter(Room.status == 'AVAILABLE')
+        filter(PriceConfig.is_weekend == is_weekend_now()).\
+        filter(Room.is_available == True)
 
     if date:
         if isinstance(date, str):
@@ -74,3 +77,5 @@ def add_user(username, password, fullname, phone_number):
         raise Exception('Username đã tồn tại!')
 
 
+def get_all_cate():
+    return Category.query.all()

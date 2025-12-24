@@ -1,0 +1,11 @@
+{% extends 'admin/master.html'%}
+
+{% block title %}
+    Admin Dashboard
+{% endblock%}
+
+{% block body %}
+    {% if current_user.is_authenticated and current_user.type == 'Admin' %}
+    <h2> Chào Admin </h2>
+    {% endif %}
+{% endblock%}

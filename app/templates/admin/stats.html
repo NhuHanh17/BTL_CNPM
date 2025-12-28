@@ -1,0 +1,193 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<style>
+    .admin-header {
+        font-size: 32px !important;
+        font-weight: 900 !important;
+        color: #2c3e50;
+        text-transform: uppercase;
+        border-bottom: 4px solid #36A2EB;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .selector-container {
+        display: inline-flex;
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 5px;
+        margin-bottom: 30px;
+    }
+
+    .selector-item {
+        text-decoration: none !important;
+        font-size: 18px !important;
+        font-weight: 800 !important;
+        padding: 10px 25px;
+        color: #6c757d !important;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .selector-active {
+        background: #36A2EB !important;
+        color: #fff !important;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .table-custom {
+        font-size: 18px !important;
+        margin-bottom: 0;
+    }
+
+    .table-custom thead {
+        background: #f8f9fa;
+        color: #2c3e50;
+    }
+
+    .table-custom th, .table-custom td {
+        padding: 15px !important;
+        border: 1px solid #f1f1f1 !important;
+        color: #444 !important;
+        font-weight: 600 !important;
+    }
+
+    .chart-container {
+        padding: 20px;
+        height: 400px;
+    }
+</style>
+
+<div class="container-fluid">
+    <h1 class="admin-header mt-3">Thống kê & Báo cáo Doanh thu</h1>
+
+    <div class="selector-container">
+        <a href="?type=day" class="selector-item {{ 'selector-active' if filter_type == 'day' else '' }}">Hôm nay</a>
+        <a href="?type=week" class="selector-item {{ 'selector-active' if filter_type == 'week' else '' }}">Theo tuần</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="stat-card">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Tên Phòng</th>
+                            <th>Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in revenue_data %}
+                        <tr>
+                            <td>{{ r[0] }}</td>
+                            <td class="text-primary">{{ "{:,.0f}".format(r[1]) }} ₫</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="stat-card">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="admin-header mt-4">Xu hướng sử dụng loại phòng</h1>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="stat-card">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Loại Phòng</th>
+                            <th>Số hóa đơn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in usage_data %}
+                        <tr>
+                            <td>{{ u[0] }}</td>
+                            <td>{{ u[1] }} Hóa đơn</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="stat-card">
+                <div class="chart-container">
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function createChart(ctxId, label, labels, data, type = 'bar') {
+        const ctx = document.getElementById(ctxId).getContext('2d');
+        const brightColors = ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+
+        new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: type === 'pie' ? brightColors : '#36A2EB',
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: type === 'pie' ? {} : {
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { font: { size: 14, weight: 'bold' }, color: '#666' } 
+                    },
+                    x: { 
+                        ticks: { font: { size: 14, weight: 'bold' }, color: '#666' } 
+                    }
+                },
+                plugins: {
+                    legend: { 
+                        display: true,
+                        position: type === 'pie' ? 'right' : 'top',
+                        labels: { font: { size: 14, weight: 'bold' }, color: '#333' } 
+                    }
+                }
+            }
+        });
+    }
+
+    window.onload = function() {
+        const revLabels = [{% for r in revenue_data %} '{{ r[0] }}', {% endfor %}];
+        const revData = [{% for r in revenue_data %} {{ r[1] }}, {% endfor %}];
+        createChart('revenueChart', 'Doanh thu (VNĐ)', revLabels, revData, 'bar');
+
+        const useLabels = [{% for u in usage_data %} '{{ u[0] }}', {% endfor %}];
+        const useData = [{% for u in usage_data %} {{ u[1] }}, {% endfor %}];
+        createChart('usageChart', 'Số lượng hóa đơn', useLabels, useData, 'pie'); 
+    }
+</script>
+{% endblock %}

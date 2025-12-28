@@ -318,18 +318,33 @@ def get_invoice_service_by_id(invoice_id):
     return InvoiceService.query.get(invoice_id)
 
 
-def get_today_revenue_by_room():
-
-    target_date = datetime.now().strftime('%Y-%m-%d')
-
-    results = db.session.query(
-        Room.name.label('room_name'),
-        func.sum(Invoice.total_amount).label('total_revenue')
+def get_revenue_stats(time='day'):
+    now = datetime.now()
+    query = db.session.query(
+        Room.name,
+        func.sum(Invoice.total_amount)
     ).join(Booking, Room.id == Booking.room_id) \
         .join(Invoice, Booking.id == Invoice.booking_id) \
-        .filter(func.date(Invoice.created_at) == target_date) \
-        .filter(Booking.status == 'COMPLETED') \
-        .group_by(Room.id, Room.name) \
+        .filter(Invoice.is_paid == True)
+
+    if time == 'day':
+
+        query = query.filter(func.date(Invoice.created_at) == now.date())
+    elif time == 'week':
+
+        start_date = now.date() - timedelta(days=7)
+        query = query.filter(func.date(Invoice.created_at) >= start_date)
+
+    return query.group_by(Room.id, Room.name).all()
+
+def get_trend():
+    return db.session.query(RoomType.name, func.count(Invoice.id)) \
+        .join(Room, RoomType.id == Room.type_id) \
+        .join(Booking, Room.id == Booking.room_id) \
+        .join(Invoice, Booking.id == Invoice.booking_id) \
+        .filter(func.date(Invoice.created_at) == func.current_date()) \
+        .group_by(RoomType.name) \
         .all()
 
-    return results
+
+

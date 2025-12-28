@@ -3,11 +3,11 @@ import hashlib
 import math
 
 
-from flask import flash, render_template, redirect, request, jsonify
+from flask import flash, render_template, redirect, request
 from app import app, dao, login, db
 from flask_login import current_user, login_user, logout_user, login_required
 
-from app.models import Booking, User, UserRole, BookingStatus,ServicesItem
+from app.models import Booking,UserRole, BookingStatus,ServicesItem
 from app import admin, utils
 
 @app.route('/')

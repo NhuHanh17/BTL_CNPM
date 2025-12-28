@@ -34,30 +34,7 @@
 
 {% block body %}
     {% if current_user.is_authenticated and current_user.type == UserRole.ADMIN %}
-        <div class="container mt-4">
-            <h2> Báo cáo thống kê ngày hôm nay </h2>   </div>
-<div class="row">
-    <div class="col-md-5 col-6">
-        <table class="table">
-            <tr>
-                <th>Phòng</th>
-                <th>Tổng doanh thu</th>
-            </tr>
-            {% for r, p in data %}
-            <tr>
-                <td>{{ r }}</td>
-                <td>{{ p  }}VND</td>
 
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <div class="col-md-7 col-6">
-        <canvas id="myChart1"></canvas>
-    </div>
-</div>
-<hr />
 
     {% else %}
         <div class="login-container">

@@ -1,11 +1,11 @@
 import hashlib
-from flask_admin import Admin, expose, BaseView
+from flask_admin import Admin, expose, BaseView, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from wtforms import PasswordField
 from app import app, db, dao
 from app.models import  PriceConfig, UserRole, Room, ServicesItem, Staff, Customer
 from flask_login import current_user, logout_user
-from flask import redirect
+from flask import redirect, request
 from flask import flash
 from datetime import datetime, time, timedelta
 
@@ -56,15 +56,18 @@ class ServicesItemView(authenticated_only):
 class ConfigView(authenticated_only):
     form_columns = ['room', 'price_per_hour', 'start_time', 'end_time', 'is_weekend']
 
-class StatsView(authenticated_only):
+class StatsView(BaseView):
     @expose('/')
     def index(self):
-        data = dao.get_today_revenue_by_room()
+        time = request.args.get('type', 'day')
+        room_data=dao.get_revenue_stats(time=time)
+        room_type_data = dao.get_trend()
 
-        return self.render('admin/index.html', data=data)
-
-
-
+        return self.render('admin/stats.html',revenue_data= room_data, usage_data=room_type_data)
+    
+    def is_accessible(self) -> bool:
+        return current_user.is_authenticated and current_user.type == UserRole.ADMIN
+    
 class LogoutView(BaseView):
     @expose('/')
     def index(self):
@@ -74,12 +77,22 @@ class LogoutView(BaseView):
     def is_accessible(self) -> bool:
         return current_user.is_authenticated and current_user.type == UserRole.ADMIN
 
-admin = Admin(app=app, name='Karaoke Admin')
+class MyAdminIndexView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        time = request.args.get('type', 'day')
+        return self.render('admin/index.html', revenue_data=dao.get_revenue_stats(time),
+                    usage_data=dao.get_trend())
+
+
+admin = Admin(app=app, name='Karaoke Admin', index_view=MyAdminIndexView())
 
 admin.add_view(AdminView(Staff, db.session, category='Account'))
 admin.add_view(CustomerView(Customer, db.session, category='Account'))
 admin.add_view(RoomView(Room, db.session, category='Danh mục'))
 admin.add_view(ServicesItemView(ServicesItem, db.session, category='Danh mục'))
 admin.add_view(ConfigView(PriceConfig, db.session, category='Cấu hình'))
+
+admin.add_view(StatsView(name='Thống kê'))
 
 admin.add_view(LogoutView(name='Đăng xuất'))

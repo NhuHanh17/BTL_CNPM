@@ -11,7 +11,7 @@ from datetime import datetime, time, timedelta
 
 class authenticated_only(ModelView):
     def is_accessible(self) -> bool:
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.type == UserRole.ADMIN
 
 
 class AdminView(authenticated_only):
@@ -36,9 +36,10 @@ class AdminView(authenticated_only):
                 model.password = existing_model.password
             
         super(AdminView, self).on_model_change(form, model, is_created)
+    
 
-    def is_accessible(self) ->bool:
-        return current_user.is_authenticated and current_user.type == UserRole.ADMIN
+class CustomerView(authenticated_only):
+     form_columns = ['username', 'password', 'fullname', 'phone_number']
 
 class RoomView(authenticated_only):
     form_columns = ['name', 'note', 'image', 'is_available','type']
@@ -71,12 +72,12 @@ class LogoutView(BaseView):
         return redirect('/admin')
 
     def is_accessible(self) -> bool:
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.type == UserRole.ADMIN
 
 admin = Admin(app=app, name='Karaoke Admin')
 
 admin.add_view(AdminView(Staff, db.session, category='Account'))
-admin.add_view(AdminView(Customer, db.session, category='Account'))
+admin.add_view(CustomerView(Customer, db.session, category='Account'))
 admin.add_view(RoomView(Room, db.session, category='Danh mục'))
 admin.add_view(ServicesItemView(ServicesItem, db.session, category='Danh mục'))
 admin.add_view(ConfigView(PriceConfig, db.session, category='Cấu hình'))

@@ -1,3 +1,23 @@
+document.addEventListener("DOMContentLoaded", function() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
+    document.getElementById("inputDate").value = today;
+
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const currentTime = `${hours}:${minutes}`;
+    document.getElementById("inputTime").value = currentTime;
+
+    if (typeof calculateTotal === "function") {
+        calculateTotal();
+    }
+});
+
+
 function adjustDuration(delta) {
   let input = document.getElementById("inputDuration");
   let val = parseInt(input.value) || 0;
@@ -57,36 +77,61 @@ function showQuickBook(id, name) {
   new bootstrap.Modal(document.getElementById("quickBookModal")).show();
 }
 
-function handleRoomAction(id, name, isAvailable, isLockedSoon, nextTime) {
-  const panel = document.getElementById("invoice-panel");
-  if (!isAvailable) {
-    panel.innerHTML =
-      '<div class="text-center p-5"><div class="spinner-border text-info"></div></div>';
-    fetch(`/api/get-invoice/${id}`)
-      .then((res) => res.text())
-      .then((html) => {
-        panel.innerHTML = html;
-      });
-  } else {
-    if (isLockedSoon) {
-      panel.innerHTML = `
-                <div class="p-4 text-center">
-                    <i class="fa-solid fa-clock-rotate-left fs-1 text-warning mb-3"></i>
-                    <h5 class="text-white">${name}</h5>
-                    <div class="alert alert-warning small">Có khách đặt lúc ${nextTime}</div>
-                </div>`;
+function handleRoomAction(id, name, isAvailable, isLockedSoon, nextTime, bookingId) {
+    const panel = document.getElementById("invoice-panel");
+    
+    if (!isAvailable) {
+        panel.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-info"></div></div>';
+        fetch(`/api/get-invoice/${id}`)
+            .then((res) => res.text())
+            .then((html) => { panel.innerHTML = html; });
     } else {
-      panel.innerHTML = `
+        if (isLockedSoon) {
+            panel.innerHTML = `
+                <div class="p-4 text-center">
+                    <h5 class="text-white">${name}</h5>
+                    <div class="alert alert-warning small">Khách đặt trước: <b>${nextTime}</b></div>
+                    <a href="/cashier/open-room/${bookingId}" class="btn btn-warning w-100 fw-bold">XÁC NHẬN NHẬN PHÒNG</a>
+                </div>`;
+        } else {
+            panel.innerHTML = `
                 <form action="/cashier/quick-book" method="POST" class="p-4 text-center">
                     <input type="hidden" name="room_id" value="${id}">
-                    <i class="fa-solid fa-door-open fs-1 text-success mb-3"></i>
                     <h5 class="text-white">${name}</h5>
                     <div class="mb-3 mt-3 text-start">
-                        <label class="form-label text-secondary small">Số lượng khách:</label>
-                        <input type="number" name="customer_quantity" class="form-control form-control-sm bg-dark text-white border-secondary" value="1" min="1">
+                        <label class="form-label text-secondary small">Nhập số lượng khách:</label>
+                        <input type="number" name="customer_quantity" class="form-control bg-dark text-white border-secondary" value="1" min="1">
                     </div>
-                    <button type="submit" class="btn btn-success w-100 fw-bold">MỞ PHÒNG NGAY</button>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">MỞ PHÒNG TRỰC TIẾP</button>
                 </form>`;
+        }
     }
-  }
+}
+
+function showAddService(roomId) {
+    document.getElementById('currentRoomId').value = roomId;
+    var myModal = new bootstrap.Modal(document.getElementById('addServiceModal'));
+    myModal.show();
+}
+
+function addServiceToBill(serviceId) {
+    const roomId = document.getElementById('currentRoomId').value;
+    const quantity = parseInt(document.getElementById('qty-' + serviceId).value);
+
+    fetch('/api/add-service', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            'room_id': roomId,
+            'service_id': serviceId,
+            'quantity': quantity
+        })
+    }).then(res => res.json()).then(data => {
+        if (data.status === 200) {
+            alert("Thành công: " + data.message);
+            location.reload(); 
+        } else {
+            alert("Lỗi: " + data.message);
+        }
+    });
 }

@@ -92,14 +92,13 @@ def add_user(username, password, fullname, phone_number):
 
     try:
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError :
         db.session.rollback()
         raise Exception('Username đã tồn tại!')
 
 
 def get_all_cate():
     return Category.query.all()
-
 
 def create_booking(start_datetime, end_datetime, total_price, room_id, quantity, customer_id=None):
     try:
@@ -126,7 +125,6 @@ def create_booking(start_datetime, end_datetime, total_price, room_id, quantity,
         raise Exception('Lỗi khi tạo booking!')
 
 
-# def get_room_price_by_id()
 
 def get_room_by_id(room_id):
     result = db.session.query(Room, RoomType, PriceConfig). \
@@ -179,18 +177,8 @@ def cancel_booking(booking_id):
     except Exception as e:
         db.session.rollback()
 
-
-def check_booking_conflict(room_id, check_in, check_out):
-    return Booking.query.filter(
-        Booking.room_id == room_id,
-        Booking.status != BookingStatus.CANCELLED,
-        Booking.start_datetime < check_out,
-        Booking.end_datetime > check_in
-    ).first()
-
-
 def create_invoice(room_price, service_price, total_price, booking_id, staff_id, member_card_id=None,
-                   services_used=None, discount=None, tax=None):
+                   services_used=None, discount=None, tax=0.1):
     try:
 
         booking = Booking.query.get(booking_id)
@@ -234,59 +222,27 @@ def create_invoice(room_price, service_price, total_price, booking_id, staff_id,
         db.session.rollback()
 
 
-def get_room_usage_time(room_id):
-    result = db.session.query(Invoice, Booking) \
-        .join(Booking, Invoice.booking_id == Booking.id) \
-        .filter(Booking.room_id == room_id) \
-        .filter(Booking.status == BookingStatus.CONFIRMED) \
-        .order_by(Invoice.created_at.desc()).first()
-
-    if result:
-        invoice, booking = result
-        start_time = invoice.created_at
-        now = datetime.now()
-
-        diff = now - start_time
-        hours = diff.seconds // 3600
-        minutes = (diff.seconds % 3600) // 60
-
-        return {
-            "start_time": start_time.strftime('%H:%M'),
-            "duration": f"{hours} giờ {minutes} phút",
-            "total_minutes": diff.seconds // 60
-        }
-
 
 def update_invoice(invoice_id, **kwargs):
     try:
         invoice = Invoice.query.get(invoice_id)
-        
         if not invoice:
             return False
 
         for key, value in kwargs.items():
-            if key == 'room_price' and value is not None:
-                invoice.room_price = value
-            if  key == 'service_price' and value is not None:
-                invoice.service_price = value
-            if key == 'discount' and value is not None:
-                invoice.discount = value
-            if key == 'is_paid' and value is not None:
-                invoice.is_paid = value 
-            if key == 'membercard_id' and value is not None:
-                invoice.membercard_id  = value
-            
-
+            if hasattr(invoice, key) and value is not None:
+                setattr(invoice, key, value)
+    
         invoice.total_price = (invoice.room_price + invoice.service_price - (invoice.discount or 0))
         invoice.total_amount = invoice.total_price * (1 + invoice.tax)
 
         db.session.commit()
-    
-    except Exception as e:
+        return True
+    except Exception:
         db.session.rollback()
+        return False
 
-
-def get_all_rooms_with_booking_check(name=None, capacity=None, status=None):
+def get_all_rooms_with_booking_check(name=None, capacity=None) :
     search_time = datetime.now().time()
     query = db.session.query(Room, RoomType, PriceConfig). \
         join(RoomType, Room.type_id == RoomType.id). \
@@ -299,11 +255,6 @@ def get_all_rooms_with_booking_check(name=None, capacity=None, status=None):
         query = query.filter(Room.name.ilike(f'%{name}%'))
     if capacity:
         query = query.filter(RoomType.max_capacity >= int(capacity))
-    if status:
-        if status == 'available':
-            query = query.filter(Room.is_available == True)
-        elif status == 'occupied':
-            query = query.filter(Room.is_available == False)
 
     rooms_data = query.all()
     now = datetime.now()
@@ -320,36 +271,51 @@ def get_all_rooms_with_booking_check(name=None, capacity=None, status=None):
 
         r.is_locked_soon = True if upcoming else False
         r.next_booking_time = upcoming.start_datetime.strftime('%H:%M') if upcoming else ""
+        r.upcoming_booking_id = upcoming.id if upcoming else None
         results.append((r, rt, rp))
     return results
 
 
-def get_all_invoice():
-    return Invoice.query.all(is_paid=True)
-
-
 def get_active_invoice_by_room(room_id):
-    invoice = db.session.query(Invoice).join(Booking).filter(
-        Booking.room_id == room_id,
-        Invoice.is_paid == False
-    ).first()
+    result = db.session.query(Invoice, Booking, Room, PriceConfig)\
+        .join(Booking, Invoice.booking_id == Booking.id)\
+        .join(Room, Booking.room_id == Room.id)\
+        .join(RoomType, Room.type_id == RoomType.id)\
+        .join(PriceConfig, RoomType.id == PriceConfig.room_type_id)\
+        .filter(Room.id == room_id, 
+                Invoice.is_paid == False,
+                PriceConfig.is_weekend == is_weekend_now(),
+                PriceConfig.start_time <= datetime.now().time(),
+                PriceConfig.end_time >= datetime.now().time()).first()
 
-    booking = db.session.query(Booking) \
-        .join(Invoice, Invoice.booking_id == Booking.id) \
-        .filter(Invoice.id == invoice.id).first()
+    if result:
+        invoice, booking, room, price_config = result
+        
+        now = datetime.now()
+        duration_delta = now - booking.start_datetime
+        duration_hours =abs( duration_delta.total_seconds()) / 3600
+        
+        invoice.room_price = round(duration_hours * price_config.price_per_hour)
+        
+        invoice.total_price = invoice.room_price + invoice.service_price
+        invoice.total_amount = invoice.total_price * (1+ invoice.tax)
+        
+        service_details = db.session.query(InvoiceService, ServicesItem)\
+            .join(ServicesItem, InvoiceService.service_item_id == ServicesItem.id)\
+            .filter(InvoiceService.invoice_id == invoice.id).all()
+            
+        return room, invoice, service_details, booking
+    return None
 
-    if invoice:
-        room = Room.query.get(room_id)
-        services = []
-        return room, invoice, services, booking
+def get_all_invoice_services(invoice_id, service_id):
+    return InvoiceService.query.filter_by(
+                        invoice_id=invoice_id,
+                        service_id=service_id).first()
 
 
-def get_services_item_by_id(id):
-    return ServicesItem.query.get(id)
 
-
-def get_invoice_service_by_id(id):
-    return InvoiceService.query.get(id)
+def get_invoice_service_by_id(invoice_id):
+    return InvoiceService.query.get(invoice_id)
 
 
 def get_today_revenue_by_room():

@@ -3,7 +3,7 @@ import json
 import hashlib
 from app import db, app
 
-from app.models import Room, RoomType, PriceConfig,Category, Admin, ServicesItem
+from app.models import Room, RoomType, PriceConfig,Category, Admin, ServicesItem, Staff
 
 def load_mock_data(path):
     file_path = os.path.join(app.root_path, path)
@@ -19,7 +19,11 @@ if __name__ == '__main__':
         u = Admin(username='admin',
                  password=str(hashlib.md5('1111'.encode('utf-8')).hexdigest()))
         db.session.add(u)
-     
+
+        s = Staff(username='ca1',
+                 password=str(hashlib.md5('1111'.encode('utf-8')).hexdigest()))
+                
+        db.session.add(u)
 
         data = load_mock_data('static/json/data.json')
         for rt_data in data['room_type']:

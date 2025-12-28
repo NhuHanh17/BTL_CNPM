@@ -173,7 +173,7 @@ class Invoice(CreatedAt):
     room_price = Column(Float, default=0.0)
     service_price = Column(Float, default=0.0)
     discount = Column(Float, default=0.0, nullable=True)
-    tax = Column(Float, default=0.05)
+    tax = Column(Float, default=0.1)
     total_price = Column(Float, default=0.0)
     is_cash = Column(Boolean, default=True)
     is_paid = Column(Boolean, default=False)

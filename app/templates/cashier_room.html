@@ -51,7 +51,7 @@
 
                         <div class="card h-100 bg-black border-0 border-top border-4 shadow-sm room-card
                             {% if not r.is_available %}border-danger{% elif r.is_locked_soon %}border-warning{% else %}border-success{% endif %}"
-                            onclick="handleRoomAction({{ r.id }} , '{{ r.name }}', {{ r.is_available|tojson }}, {{ r.is_locked_soon|tojson }}, '{{ r.next_booking_time }}')">
+                            onclick="handleRoomAction({{ r.id }} , '{{ r.name }}', {{ r.is_available|tojson }}, {{ r.is_locked_soon|tojson }}, '{{ r.next_booking_time }}', '{{ r.upcoming_booking_id}}')">
 
                             <div class="position-relative" style="height: 140px;">
                                 <img src="{{ r.image }}" class="w-100 h-100 object-fit-cover {% if not r.is_available %}opacity-50{% endif %}">
@@ -103,6 +103,48 @@
                     <button type="submit" class="btn btn-success w-100 fw-bold">XÁC NHẬN MỞ PHÒNG</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Thêm dịch vụ - Phòng <span id="modalRoomName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentRoomId">
+                <div class="row" id="serviceList">
+                   {% for s in services %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-secondary border-0 text-white h-100">
+                            <div class="card-body text-center p-2">
+                                <h6 class="small">{{ s.name }}</h6>
+                                <p class="text-warning mb-2 small">Giá: {{ "{:,.0f}".format(s.price) }}đ</p>
+                                <p class="text-info mb-2" style="font-size: 0.8rem;">Còn lại: {{ s.capacity }}</p>
+                                
+                                <div class="input-group input-group-sm mb-2">
+                                    <button class="btn btn-outline-light" type="button" onclick="stepper('qty-{{ s.id }}', -1)">-</button>
+                                    
+                                    <input type="number" class="form-control text-center bg-dark text-white border-secondary" 
+                                        id="qty-{{ s.id }}" value="1" min="1" max="{{ s.capacity }}" readonly>
+                                    
+                                    <button class="btn btn-outline-light" type="button" onclick="stepper('qty-{{ s.id }}', 1, {{ s.capacity }})">+</button>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-sm w-100" 
+                                        onclick="addServiceToBill({{ s.id }})" 
+                                        {% if s.capacity <= 0 %}disabled{% endif %}>
+                                    {% if s.capacity <= 0 %}HẾT HÀNG{% else %}THÊM{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

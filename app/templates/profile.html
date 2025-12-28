@@ -107,8 +107,15 @@
                                                     <span class="badge bg-success bg-opacity-25 text-success">Hoàn thành</span>
                                                     {% elif history.status ==  BookingStatus.CANCELLED %}
                                                     <span class="badge bg-danger bg-opacity-25 text-danger">Đã hủy</span>
-                                                    {% else %}
+                                                    {% elif history.status == BookingStatus.PENDING %}
                                                     <span class="badge bg-warning bg-opacity-25 text-warning">Đang chờ</span>
+                                                    <a href="/cancel-booking/{{ history.id }}" 
+                                                    class="btn btn-outline-danger btn-sm py-0" 
+                                                    onclick="return confirm('Bạn chắc chắn muốn hủy đơn đặt này?')">
+                                                    Hủy đơn
+                                                    </a>
+                                                    {% else %}
+                                                    <span class="badge bg-success bg-opacity-25 text-success">Đã duyệt</span>
                                                     {% endif %}
                                                 </td>
                                             </tr>   

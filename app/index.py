@@ -2,11 +2,12 @@ from datetime import datetime, time, timedelta
 import hashlib
 import math
 
-from flask import flash, render_template, redirect, request
-from app import app, dao, login
+
+from flask import flash, render_template, redirect, request, jsonify
+from app import app, dao, login, db
 from flask_login import current_user, login_user, logout_user, login_required
 
-from app.models import Booking, Room, User, UserRole, BookingStatus
+from app.models import Booking, User, UserRole, BookingStatus,ServicesItem
 from app import admin, utils
 
 @app.route('/')
@@ -162,13 +163,13 @@ def booking_submit():
             quantity=people
             )
 
-    return redirect('/profile')
+    return redirect('/profile?tab=history')
 
 
 
 @app.route('/menu')
 def menu_view():
-    categories = dao.get_categories()
+    categories = dao.get_all_cate()
     services_items = dao.get_services_by_category(cate_id=request.args.get('category_id'))
 
     return render_template('menu.html', categories=categories, services_items=services_items)
@@ -184,6 +185,22 @@ def profile_view():
     histories = dao.get_bookings_by_customer(current_user.id)
     count = len(histories)
     return render_template('profile.html', histories=histories, count = count)
+
+@app.route('/cancel-booking/<int:booking_id>')
+@login_required
+def customer_cancel_booking(booking_id):
+    booking = Booking.query.get(booking_id)    
+    if booking and booking.customer_id == current_user.id and booking.status == BookingStatus.PENDING:
+        try:
+            dao.cancel_booking(booking_id)
+            flash('Đã hủy đơn đặt phòng thành công!', 'success')
+        except Exception as ex:
+            flash(f'Lỗi khi hủy đơn: {str(ex)}', 'danger')
+    else:
+        flash('Bạn không có quyền hủy đơn này hoặc đơn đã được xử lý.', 'danger')
+        
+    return redirect('/profile')
+
 
 @app.route('/change-password', methods=['GET', 'POST'])
 @login_required
@@ -237,51 +254,53 @@ def reject_booking(booking_id):
 
 @app.route('/cashier/rooms')
 def cashier_rooms_view():
-  
     return render_template('cashier_room.html')
-
 
 @app.route('/cashier/quick-book', methods=['POST'])
 @login_required
 def quick_book():
-    if current_user.type != UserRole.STAFF:
-        return redirect('/')
-
     room_id = request.form.get('room_id')
-    people = request.form.get('people')
-
-
+    people = request.form.get('customer_quantity', 1) 
+    
     try:
-        if utils.check_in(room_id, staff_id=current_user.id, people=people):
-            flash('Mở phòng nhanh thành công!', 'success')
+        utils.check_in(room_id=room_id, staff_id=current_user.id, people=people)
+        flash('Mở phòng trực tiếp thành công!', 'success')
     except Exception as ex:
-        pass
-
-
+        flash(f'Lỗi: {str(ex)}', 'danger')
+        
     return redirect("/cashier/rooms")
 
 @app.route('/cashier/open-room/<int:booking_id>')
 @login_required
 def open_room_booking(booking_id):
     booking = Booking.query.get(booking_id)
-    if utils.check_in(room_id=booking.room_id, staff_id=current_user.id, booking_id=booking_id):
-        flash('Đã duyệt đơn và tạo hóa đơn!', 'success')
+    booking.start_datetime = datetime.now()
+
+    db.session.commit()
+    if not booking:
+        flash('Không tìm thấy đơn đặt phòng!', 'danger')
+        return redirect("/cashier/rooms")
+    try:
+        utils.check_in(room_id=booking.room_id, staff_id=current_user.id, booking_id=booking_id)
+        flash(f'Đã xác nhận phòng cho khách đặt trước!', 'success')
+    except Exception as ex:
+        flash(f'Lỗi: {str(ex)}', 'danger')
+        
     return redirect("/cashier/rooms")
 
 
 @app.route('/api/get-invoice/<int:room_id>')
 @login_required
 def get_invoice_api(room_id):
-    invoice_data = dao.get_active_invoice_by_room(room_id)
+    data = dao.get_active_invoice_by_room(room_id)
     
-    if invoice_data:
-        room, invoice, service_details, booking = invoice_data
+    if data:
+        room, invoice, service_details, booking = data
         return render_template('components/invoice_detail.html', 
                                room=room, 
                                invoice=invoice, 
-                               booking = booking,
+                               booking=booking,
                                service_details=service_details)
-    
     
     return "<p class='p-4 text-center text-muted'>Không tìm thấy hóa đơn.</p>"
 
@@ -301,15 +320,26 @@ def checkout_room(room_id):
     return redirect("/cashier/rooms")
 
 
+@app.route('/api/add-service', methods=['POST'])
+def add_service_api():
+    data = request.json
+    room_id = data.get('room_id')
+    service_id = data.get('service_id')
+    quantity = int(data.get('quantity'))
+
+    utils.add_service_to_invoice(room_id, service_id, quantity)
+
+
 
 @login.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return dao.get_user_by_id(user_id)
 
 
 @app.context_processor
 def inject_role():
     return dict(UserRole=UserRole)
+
 @app.context_processor
 def booking_status():
     return dict(BookingStatus=BookingStatus)
@@ -318,10 +348,12 @@ def booking_status():
 def load_common_data():
     rooms, count = dao.get_all_rooms_info()
     all_room = dao.get_all_rooms_with_booking_check()
+    services_items = ServicesItem.query.all()
     return {
         'rooms': rooms,
         'count_rooms': count,
-        'all_room': all_room
+        'all_room': all_room,
+        'services' : services_items
     }
 
 

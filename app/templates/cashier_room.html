@@ -135,7 +135,7 @@
                                 </div>
                                 
                                 <button class="btn btn-primary btn-sm w-100" 
-                                        onclick="addServiceToBill({{ s.id }})" 
+                                        onclick="addServiceToBill( {{ s.id }} )" 
                                         {% if s.capacity <= 0 %}disabled{% endif %}>
                                     {% if s.capacity <= 0 %}HẾT HÀNG{% else %}THÊM{% endif %}
                                 </button>

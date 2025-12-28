@@ -46,7 +46,7 @@
             </a>
             {% else %}
             <a
-              href="/login?next=room"
+              href="/login?next=/booking/{{ r.id }}"
               class="btn btn-outline-light fw-bold"
               onclick="return confirm('Bạn cần đăng nhập để đặt phòng!');"
             >

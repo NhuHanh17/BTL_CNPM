@@ -18,7 +18,7 @@ def check_in(room_id, staff_id, booking_id=None, people = 1):
                     end_datetime=None,
                     room_id=room_id,
                     status=BookingStatus.CONFIRMED,
-                    total_price=0.0,
+                    total_price=dao.get_room_hourly_price(room_id),
                     quantity = people 
             )
 
@@ -46,76 +46,66 @@ def check_in(room_id, staff_id, booking_id=None, people = 1):
 def check_out(invoice_id, booking_id, end_datetime):
     try:
         booking = Booking.query.get(booking_id)
-        if not booking:
-            return
+        invoice = Invoice.query.get(invoice_id)
 
         start = booking.start_datetime
         end_db = booking.end_datetime if booking.end_datetime else (start + timedelta(hours=1))
-        
+
         duration_original = (end_db - start).total_seconds() / 3600
         unit_price = booking.total_price / duration_original if duration_original > 0 else booking.total_price
-
         duration_real = (end_datetime - start).total_seconds() / 3600
         room_price = round(duration_real * unit_price)
-
-        
-
+        print(duration_real)
         service_details = InvoiceService.query.filter_by(invoice_id=invoice_id).all()
         service_price = sum(item.total_price for item in service_details)
 
         booking.status = BookingStatus.COMPLETED
         booking.end_datetime = end_datetime
-        
+        booking.total_price = room_price
+
         room = Room.query.get(booking.room_id)
         if room:
             room.is_available = True
 
-        dao.update_invoice(
-            invoice_id=invoice_id,
-            room_price=room_price,
-            service_price=service_price,
-            is_paid=True
-        )
-
+        invoice.room_price = room_price
+        invoice.service_price = service_price
+        invoice.is_paid = True
         db.session.commit()
+
+
     except Exception as e:
         db.session.rollback()
         raise e
 
 
 def add_service_to_invoice(room_id, service_id, quantity):
-    booking = Booking.query.filter_by(room_id=room_id, ).first()
-    if not booking:
-        return False
+ 
+    booking = Booking.query.filter_by(room_id=room_id, status=BookingStatus.CONFIRMED).first()
+    invoice = Invoice.query.filter_by(booking_id=booking.id, is_paid=False).first()
+    service_item = dao.get_service_item_by_id(service_id)
 
-    service_item = dao.get_invoice_service_by_id(service_id)
-    if not service_item:
-        return False
+    detail = dao.get_invoice_service(invoice.id, service_id)
     
-    if service_item.capacity < quantity:
-        return False
-
-    invoice = Invoice.query.filter_by(booking_id=booking.id).first()
-
-    service_item.capacity -= quantity 
-
-    detail = dao.get_all_invoice_services(
-                        invoice_id=invoice.id,
-                        service_id=service_id).first()
-
     if detail:
         detail.quantity += quantity
+        detail.total_price = detail.quantity * service_item.price
     else:
         detail = InvoiceService(
             invoice_id=invoice.id,
-            service_id=service_id,
+            service_item_id=service_id, 
             quantity=quantity,
-            price=service_item.price
+            total_price=quantity * service_item.price
         )
         db.session.add(detail)
 
+    
+    service_item.capacity -= quantity
+    
     try:
         db.session.commit()
-        return True
+        dao.update_invoice(invoice.id)
+        return True, "Thêm dịch vụ thành công!"
     except Exception as e:
         db.session.rollback()
+        return False, str(e)
+

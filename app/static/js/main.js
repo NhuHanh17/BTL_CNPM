@@ -108,6 +108,22 @@ function handleRoomAction(id, name, isAvailable, isLockedSoon, nextTime, booking
     }
 }
 
+
+function stepper(inputId, step, maxVal = 999) {
+    let input = document.getElementById(inputId);
+    if (input) {
+        let currentVal = parseInt(input.value) || 1;
+        let newVal = currentVal + step;
+
+     
+        if (newVal >= 1 && newVal <= maxVal) {
+            input.value = newVal;
+        } else if (newVal > maxVal) {
+            alert("Số lượng yêu cầu đã đạt giới hạn tồn kho (" + maxVal + ")");
+        }
+    }
+}
+
 function showAddService(roomId) {
     document.getElementById('currentRoomId').value = roomId;
     var myModal = new bootstrap.Modal(document.getElementById('addServiceModal'));
@@ -118,6 +134,11 @@ function addServiceToBill(serviceId) {
     const roomId = document.getElementById('currentRoomId').value;
     const quantity = parseInt(document.getElementById('qty-' + serviceId).value);
 
+    if (!roomId) {
+        alert("Vui lòng chọn phòng trước!");
+        return;
+    }
+
     fetch('/api/add-service', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,12 +147,15 @@ function addServiceToBill(serviceId) {
             'service_id': serviceId,
             'quantity': quantity
         })
-    }).then(res => res.json()).then(data => {
+    })
+    .then(res => res.json())
+    .then(data => {
         if (data.status === 200) {
-            alert("Thành công: " + data.message);
-            location.reload(); 
+            alert(data.message);
+            location.reload(); // Load lại để thấy hóa đơn mới
         } else {
             alert("Lỗi: " + data.message);
         }
-    });
+    })
+    .catch(err => alert("Lỗi kết nối server!"));
 }

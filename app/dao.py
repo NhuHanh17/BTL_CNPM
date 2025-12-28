@@ -57,6 +57,29 @@ def get_suggested_rooms():
 
     return results
 
+def get_room_hourly_price(room_id):
+    now = datetime.now()
+    current_time = now.time()
+    is_weekend = now.weekday() >= 5
+
+    room = Room.query.get(room_id)
+    if not room:
+        return 0
+
+    price_cfg = PriceConfig.query.filter(
+        PriceConfig.room_type_id == room.type_id,
+        PriceConfig.is_weekend == is_weekend,
+        PriceConfig.start_time <= current_time,
+        PriceConfig.end_time >= current_time
+    ).first()
+
+    if not price_cfg:
+        price_cfg = PriceConfig.query.filter_by(
+            room_type_id=room.type_id,
+            is_weekend=is_weekend
+        ).first()
+
+    return price_cfg.price_per_hour if price_cfg else 0
 
 def get_categories():
     return Category.query.all()
@@ -223,24 +246,13 @@ def create_invoice(room_price, service_price, total_price, booking_id, staff_id,
 
 
 
-def update_invoice(invoice_id, **kwargs):
-    try:
-        invoice = Invoice.query.get(invoice_id)
-        if not invoice:
-            return False
+def update_invoice(invoice_id):
+    invoice = Invoice.query.get(invoice_id)
+    details = InvoiceService.query.filter_by(invoice_id=invoice_id).all()
+    current_service_price = sum(detail.total_price for detail in details)
 
-        for key, value in kwargs.items():
-            if hasattr(invoice, key) and value is not None:
-                setattr(invoice, key, value)
-    
-        invoice.total_price = (invoice.room_price + invoice.service_price - (invoice.discount or 0))
-        invoice.total_amount = invoice.total_price * (1 + invoice.tax)
-
-        db.session.commit()
-        return True
-    except Exception:
-        db.session.rollback()
-        return False
+    invoice.service_price = current_service_price
+    db.session.commit()
 
 def get_all_rooms_with_booking_check(name=None, capacity=None) :
     search_time = datetime.now().time()
@@ -307,15 +319,15 @@ def get_active_invoice_by_room(room_id):
         return room, invoice, service_details, booking
     return None
 
-def get_all_invoice_services(invoice_id, service_id):
+def get_invoice_service(invoice_id, service_id):
+    from app.models import InvoiceService
     return InvoiceService.query.filter_by(
-                        invoice_id=invoice_id,
-                        service_id=service_id).first()
+        invoice_id=invoice_id, 
+        service_item_id=service_id
+    ).first()
 
-
-
-def get_invoice_service_by_id(invoice_id):
-    return InvoiceService.query.get(invoice_id)
+def get_service_item_by_id(service_id):
+    return ServicesItem.query.get(service_id)
 
 
 def get_revenue_stats(time='day'):
@@ -345,6 +357,5 @@ def get_trend():
         .filter(func.date(Invoice.created_at) == func.current_date()) \
         .group_by(RoomType.name) \
         .all()
-
 
 

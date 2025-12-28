@@ -3,7 +3,7 @@ import hashlib
 import math
 
 
-from flask import flash, render_template, redirect, request
+from flask import flash, render_template, redirect, request, jsonify
 from app import app, dao, login, db
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -322,12 +322,24 @@ def checkout_room(room_id):
 
 @app.route('/api/add-service', methods=['POST'])
 def add_service_api():
-    data = request.json
-    room_id = data.get('room_id')
-    service_id = data.get('service_id')
-    quantity = int(data.get('quantity'))
+    try:
+        data = request.json
+        room_id = data.get('room_id')
+        service_id = data.get('service_id')
+        quantity = int(data.get('quantity', 1))
 
-    utils.add_service_to_invoice(room_id, service_id, quantity)
+        # Gọi utils và kiểm tra kết quả trả về
+        result = utils.add_service_to_invoice(room_id, service_id, quantity)
+        
+        # Kiểm tra nếu result là tuple (success, message)
+        if isinstance(result, tuple):
+            success, message = result
+        else:
+            success, message = result, "Xử lý thành công"
+
+        return jsonify({'status': 200 if success else 400, 'message': message})
+    except Exception as ex:
+        return jsonify({'status': 500, 'message': str(ex)})
 
 
 

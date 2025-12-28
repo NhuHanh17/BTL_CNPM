@@ -163,8 +163,8 @@ class InvoiceService(BaseModel):
     quantity = Column(Integer, default=1, nullable=False)
     total_price = Column(Float, nullable=False)
 
-    invoice_id = Column(Integer, ForeignKey('invoice.id',ondelete='CASCADE'), primary_key=True)
-    service_item_id = Column(Integer, ForeignKey('services_item.id',ondelete='CASCADE'), primary_key=True)
+    invoice_id = Column(Integer, ForeignKey('invoice.id',ondelete='CASCADE'))
+    service_item_id = Column(Integer, ForeignKey('services_item.id',ondelete='CASCADE'))
     invoice = relationship("Invoice", back_populates="invoices")
     service_item = relationship("ServicesItem", back_populates="services")
 

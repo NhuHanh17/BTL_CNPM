@@ -123,8 +123,28 @@ def add_user(username, password, fullname, phone_number):
 def get_all_cate():
     return Category.query.all()
 
+
+from sqlalchemy import or_, and_
+
+
 def create_booking(start_datetime, end_datetime, total_price, room_id, quantity, customer_id=None):
     try:
+        if end_datetime and end_datetime <= start_datetime:
+            raise Exception('Thời gian kết thúc phải sau thời gian bắt đầu!')
+
+        overlapping_booking = Booking.query.filter(
+            Booking.room_id == room_id,
+            Booking.status.in_([BookingStatus.PENDING, BookingStatus.CONFIRMED]),
+            or_(
+                and_(Booking.start_datetime <= start_datetime, Booking.end_datetime > start_datetime),
+                and_(Booking.start_datetime < end_datetime, Booking.end_datetime >= end_datetime),
+                and_(Booking.start_datetime >= start_datetime, Booking.end_datetime <= end_datetime)
+            )
+        ).first()
+
+        if overlapping_booking:
+            return False, "Phòng đã được đặt trong khung giờ này!"
+
         booking = Booking(
             start_datetime=start_datetime,
             end_datetime=end_datetime,
@@ -134,20 +154,13 @@ def create_booking(start_datetime, end_datetime, total_price, room_id, quantity,
             customer_id=customer_id
         )
 
-        now = datetime.now()
-        if abs((start_datetime - now).total_seconds()) < 300:
-            room = Room.query.get(room_id)
-            if room:
-                room.is_available = False
-                booking.status = BookingStatus.CONFIRMED
-
         db.session.add(booking)
         db.session.commit()
-    except:
+        return True, "Đặt phòng thành công!"
+
+    except Exception as e:
         db.session.rollback()
-        raise Exception('Lỗi khi tạo booking!')
-
-
+        raise e
 
 def get_room_by_id(room_id):
     result = db.session.query(Room, RoomType, PriceConfig). \

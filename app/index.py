@@ -130,19 +130,19 @@ def booking_page(room_id):
 def booking_submit():
 
     room_id = request.form.get('room_id')
-    date_str = request.form.get('date')      
-    time_str = request.form.get('time')      
+    date_str = request.form.get('date')
+    time_str = request.form.get('time')
     duration = int(request.form.get('duration'))
     people = int(request.form.get('people'))
-    
+
     data = dao.get_room_by_id(room_id)
     r_price = data.PriceConfig
-    room = data.Room    
+    room = data.Room
     r_type = data.RoomType
 
     check_in = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
     check_out = check_in + timedelta(hours=duration)
-        
+
     if check_in < datetime.now():
         err_msg='Thời gian đặt phòng phải lớn hơn thời gian hiện tại.'
         return render_template('booking.html', room=room, r_type=r_type, r_price=r_price, err_msg=err_msg)
@@ -151,20 +151,23 @@ def booking_submit():
     data = dao.get_room_by_id(room_id)
     price = data.PriceConfig.price_per_hour
     room = data.Room
-    
+
     total_price = price * duration
 
-    dao.create_booking(
+    success, message = dao.create_booking(
             room_id=room.id,
             start_datetime=check_in,
-            end_datetime=check_out,  
+            end_datetime=check_out,
             total_price=total_price,
             customer_id=current_user.id,
             quantity=people
             )
-
-    return redirect('/profile?tab=history')
-
+    if success:
+        flash(message, 'success')
+        return redirect('/profile?tab=history')
+    else:
+        flash(message, 'danger')
+        return redirect('/room')
 
 
 @app.route('/menu')

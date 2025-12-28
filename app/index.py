@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 import hashlib
 import math
 
@@ -6,16 +6,24 @@ from flask import flash, render_template, redirect, request
 from app import app, dao, login
 from flask_login import current_user, login_user, logout_user, login_required
 
-from app.models import Booking, Room, User, UserRole
-from app import admin, db
+from app.models import Booking, Room, User, UserRole, BookingStatus
+from app import admin, utils
 
 @app.route('/')
 def index():
     rooms=dao.get_suggested_rooms()
     return render_template('index.html', rooms=rooms)
 
+@app.route('/cashier')
+@login_required
+def index_casher():
+    bookings = dao.get_pending_bookings()
+    return render_template('cashier.html', bookings=bookings)
+
+
 @app.route('/login')
 def login_view():
+
     return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
@@ -27,10 +35,22 @@ def login_process():
     user = dao.auth_user(username, password)
     if user:
         login_user(user)
-
       
+        if user.type == UserRole.ADMIN:
+            return redirect('/admin')
+            
+        elif user.type == UserRole.STAFF:
+            return redirect('/cashier')
+        
         return redirect(next if next else '/')
-    return render_template('login.html', err_msg='Invalid username or password')
+    
+    
+    flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
+
+    return render_template('login.html')
+
+    
+    
 
 @app.route('/logout')
 def logout_view():
@@ -65,8 +85,8 @@ def register_process():
 def room_view():
     capacity = request.args.get('capacity', '5') 
     date = request.args.get('date',datetime.now().strftime('%Y-%m-%dT%H:%M'))
-    end = request.args.get('end', '23:59:59')
-
+    end = request.args.get('time', '23:00:00')
+    page=int(request.args.get('page', 1))
     try:
 
         date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M')
@@ -74,19 +94,20 @@ def room_view():
         rooms, count_rooms = dao.get_all_rooms_info(
             capacity=capacity, 
             date=date_obj, 
-            end=end
+            end=end,
+            page = page
         )
 
     except Exception as ex:
         rooms, count_rooms = dao.get_all_rooms_info()
-
-    print (rooms)
+    
 
     return render_template('room.html', rooms=rooms,
                            capacity=capacity,
                            date = date,
                            end=end,
-                           count=count_rooms)
+                           count=count_rooms,
+                            pages=math.ceil(count_rooms/app.config['PAGE_SIZE']))
 
 
 
@@ -98,7 +119,6 @@ def booking_page(room_id):
     room = data.Room
     r_type = data.RoomType
     r_price = data.PriceConfig
-
     return render_template('booking.html', room=room, r_type=r_type, r_price=r_price)
 
 
@@ -127,20 +147,13 @@ def booking_submit():
         return render_template('booking.html', room=room, r_type=r_type, r_price=r_price, err_msg=err_msg)
 
 
-    conflict = Booking.query.filter(
-        Booking.room_id == room_id,
-        Booking.status != 'cancelled',     
-        Booking.start_datetime < check_out, 
-        Booking.end_datetime > check_in 
-    ).first()
-
     data = dao.get_room_by_id(room_id)
     price = data.PriceConfig.price_per_hour
     room = data.Room
     
     total_price = price * duration
 
-    new_booking = dao.create_booking(
+    dao.create_booking(
             room_id=room.id,
             start_datetime=check_in,
             end_datetime=check_out,  
@@ -201,9 +214,115 @@ def change_password():
         
     return redirect('/profile')
 
+
+@app.route('/cashier/approve/<int:booking_id>')
+def approve_booking(booking_id):
+    try: 
+        dao.confirm_booking(booking_id)
+        flash('Đã duyệt đơn đặt phòng thành công!', 'success')
+    except Exception as ex:
+        flash('Duyệt đơn đặt phòng thất bại! ' + str(ex), 'danger')
+    
+    return redirect(request.referrer or '/cashier')
+
+@app.route('/cashier/reject/<int:booking_id>')
+def reject_booking(booking_id):
+    try: 
+        dao.cancel_booking(booking_id)
+        flash('Đã hủy đơn đặt phòng thành công!', 'success')
+    except Exception as ex:
+        flash('Hủy đơn đặt phòng thất bại! ' + str(ex), 'danger')
+    
+    return redirect(request.referrer or '/cashier')
+
+@app.route('/cashier/rooms')
+def cashier_rooms_view():
+  
+    return render_template('cashier_room.html')
+
+
+@app.route('/cashier/quick-book', methods=['POST'])
+@login_required
+def quick_book():
+    if current_user.type != UserRole.STAFF:
+        return redirect('/')
+
+    room_id = request.form.get('room_id')
+    people = request.form.get('people')
+
+
+    try:
+        if utils.check_in(room_id, staff_id=current_user.id, people=people):
+            flash('Mở phòng nhanh thành công!', 'success')
+    except Exception as ex:
+        pass
+
+
+    return redirect("/cashier/rooms")
+
+@app.route('/cashier/open-room/<int:booking_id>')
+@login_required
+def open_room_booking(booking_id):
+    booking = Booking.query.get(booking_id)
+    if utils.check_in(room_id=booking.room_id, staff_id=current_user.id, booking_id=booking_id):
+        flash('Đã duyệt đơn và tạo hóa đơn!', 'success')
+    return redirect("/cashier/rooms")
+
+
+@app.route('/api/get-invoice/<int:room_id>')
+@login_required
+def get_invoice_api(room_id):
+    invoice_data = dao.get_active_invoice_by_room(room_id)
+    
+    if invoice_data:
+        room, invoice, service_details, booking = invoice_data
+        return render_template('components/invoice_detail.html', 
+                               room=room, 
+                               invoice=invoice, 
+                               booking = booking,
+                               service_details=service_details)
+    
+    
+    return "<p class='p-4 text-center text-muted'>Không tìm thấy hóa đơn.</p>"
+
+@app.route('/cashier/checkout/<int:room_id>', methods=['POST'])
+@login_required
+def checkout_room(room_id):
+    if current_user.type != UserRole.STAFF:
+        return redirect('/')
+    booking_id = request.form.get('booking_id')
+    invoice_id = request.form.get('invoice_id')
+
+    try:
+        utils.check_out(invoice_id=invoice_id, booking_id=booking_id, end_datetime=datetime.now())
+        flash('Thanh toán hóa đơn thành công!', 'success')
+    except Exception as ex:
+        flash('Thanh toán hóa đơn thất bại! ' + str(ex), 'danger')
+    return redirect("/cashier/rooms")
+
+
+
 @login.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+
+@app.context_processor
+def inject_role():
+    return dict(UserRole=UserRole)
+@app.context_processor
+def booking_status():
+    return dict(BookingStatus=BookingStatus)
+
+@app.context_processor
+def load_common_data():
+    rooms, count = dao.get_all_rooms_info()
+    all_room = dao.get_all_rooms_with_booking_check()
+    return {
+        'rooms': rooms,
+        'count_rooms': count,
+        'all_room': all_room
+    }
 
 
 if __name__ == '__main__':

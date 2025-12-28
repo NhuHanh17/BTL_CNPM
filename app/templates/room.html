@@ -61,15 +61,18 @@
                 {% endblock %}
          
             </div>
-                <nav class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled"><a class="page-link bg-dark border-secondary text-secondary" href="#">Trước</a></li>
-                        <li class="page-item active"><a class="page-link bg-info border-info text-white" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link bg-dark border-secondary text-white" href="#">Sau</a></li>
-                    </ul>
-                </nav>
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% for i in range(1, pages + 1) %}
+                    <li class="page-item {% if i == current_page %}active{% endif %}">
+                        <a class="page-link bg-dark border-secondary text-white" 
+                        href="{{ url_for('room_view', page=i, capacity=capacity, date=date, end=end) }}"> 
+                        {{ i }} 
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
 
             </div>
         </div>

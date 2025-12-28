@@ -6,13 +6,7 @@
 
 {% block content %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+
 
 <div class="profile-section">
     <div class="container">
@@ -80,10 +74,7 @@
                                             <label class="form-label">Số điện thoại</label>
                                             <input type="text" class="form-control form-control-dark" value="{{ current_user.phone_number }}" readonly>
                                         </div>
-                                        <div class="col-12">
-                                            <label class="form-label">Avatar</label>
-                                            <input type="file" class="form-control form-control-dark" >
-                                        </div>
+                                       
                                         <div class="col-12 mt-4 text-end">
                                             <button type="button" class="btn btn-outline-secondary me-2">Hủy</button>
                                             <button type="submit" class="btn btn-danger fw-bold px-4" style="background-color: #d63384; border:none;">Lưu thay đổi</button>
@@ -112,9 +103,9 @@
                                                 <td>{{ history.room.name }}</td>
                                                 <td class="text-warning fw-bold">{{ "{:,}".format(history.total_price) }}đ</td>
                                                 <td>
-                                                    {% if history.status == 'completed' %}
+                                                    {% if history.status == BookingStatus.COMPLETE %}
                                                     <span class="badge bg-success bg-opacity-25 text-success">Hoàn thành</span>
-                                                    {% elif history.status == 'cancelled' %}
+                                                    {% elif history.status ==  BookingStatus.CANCELLED %}
                                                     <span class="badge bg-danger bg-opacity-25 text-danger">Đã hủy</span>
                                                     {% else %}
                                                     <span class="badge bg-warning bg-opacity-25 text-warning">Đang chờ</span>

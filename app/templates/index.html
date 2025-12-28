@@ -9,14 +9,14 @@
         <div id="promoCarousel" class="carousel slide rounded-4 overflow-hidden shadow" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="https://images.unsplash.com/photo-1576525865260-9f0e7f702645?q=80&w=1200&h=300&fit=crop" class="d-block w-100" alt="Promo 1" style="height: 250px; object-fit: cover; filter: brightness(0.6);">
+                    <img src="{{ url_for('static', filename='images/background.png') }}" class="d-block w-100" alt="Promo 1" style="height: 250px; object-fit: cover; filter: brightness(0.6);">
                     <div class="carousel-caption d-none d-md-block text-start">
                         <h3 class="text-warning fw-bold">GIỜ VÀNG GIẢM 50%</h3>
                         <p>Áp dụng từ 10:00 - 17:00 tại Kingdom Karaoke.</p>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=1200&h=300&fit=crop" class="d-block w-100" alt="Promo 2" style="height: 250px; object-fit: cover; filter: brightness(0.6);">
+                    <img src="{{ url_for('static', filename='images/background.png') }}" class="d-block w-100" alt="Promo 2" style="height: 250px; object-fit: cover; filter: brightness(0.6);">
                     <div class="carousel-caption d-none d-md-block text-start">
                         <h3 class="text-info fw-bold">COMBO SINH NHẬT</h3>
                         <p>Tặng bánh kem + Gói trang trí miễn phí.</p>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title text-white">{{ r.name }}</h5>
-                        {% if r.is_available == true and r_price.price_per_hour: %}
+                        {% if r.is_available == true and r_price.price_per_hour and current_user.is_authenticated:  %}
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="badge badge-status-ok px-2 py-1"><i class="bi bi-check-circle"></i> Còn trống</span>
                             </div>
@@ -59,12 +59,10 @@
                                     <small class="text-secondary d-block">Giá giờ:</small>
                                     <span class="price-tag">{{ "{:,.0f}".format(r_price.price_per_hour) }} VNĐ<small class="fs-6 text-secondary">/h</small></span>
                                 </div>
-                               <a href="/booking?room_id={{ r.id }}"> <button class="btn btn-sm btn-outline-info"">ĐẶT NGAY</button></a>
+                               <a href="/booking/{{ r.id }}"> <button class="btn btn-sm btn-outline-info"">ĐẶT NGAY</button></a>
                             </div>
                         {% else %}
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge badge-status-full px-2 py-1"><i class="bi bi-x-circle"></i> Bận</span>
-                            </div>
+                          
                             <div class="d-flex justify-content-between align-items-end mt-3">
                                  <span class="price-tag">Liên hệ</span>
                             </div>

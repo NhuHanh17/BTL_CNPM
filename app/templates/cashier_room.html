@@ -1,0 +1,109 @@
+{% extends 'layout/base_cashier.html' %}
+{% block content %}
+<div class="container-fluid py-4 bg-dark min-vh-100 text-white">
+    <div class="row mb-4 bg-black p-3 rounded shadow-sm border border-secondary mx-1 align-items-center">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-search"></i></span>
+                <input type="text" id="searchRoom" class="form-control bg-dark text-white border-secondary"
+                       placeholder="Nhập tên phòng..." oninput="filterRooms()">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <input type="number" id="inputCapacity" class="form-control bg-dark text-white border-secondary"
+                   placeholder="Số khách tối thiểu..." oninput="filterRooms()">
+        </div>
+        <div class="col-md-4 text-end">
+            <select id="filterStatus" class="form-select bg-dark text-white border-secondary d-inline-block w-auto" onchange="filterRooms()">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="occupied">Đang hát (Bận)</option>
+                <option value="available">Sẵn sàng (Trống)</option>
+                <option value="booked_soon">Sắp có lịch (1h tới)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card bg-black border-secondary shadow sticky-top" style="top: 80px; height: calc(100vh - 120px);">
+                <div class="card-header border-secondary bg-transparent py-3">
+                    <h6 class="text-info fw-bold mb-0 text-uppercase">
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Chi tiết Hóa đơn
+                    </h6>
+                </div>
+                <div class="card-body p-0 d-flex flex-column" id="invoice-panel">
+                    <div class="text-center my-auto p-5 opacity-50">
+                        <i class="fa-solid fa-microphone-lines fs-1 d-block mb-3"></i>
+                        <p>Chọn một phòng để xem hóa đơn hoặc mở phòng mới</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="row g-3" id="room-container">
+                {% if all_room %}
+                    {% for r, r_type, r_price in all_room %}
+                    <div class="col-md-6 col-xl-4 room-item"
+                         data-status="{% if not r.is_available %}occupied{% elif r.is_locked_soon %}booked_soon{% else %}available{% endif %}"
+                         data-name="{{ r.name.lower() }}"
+                         data-capacity="{{ r_type.max_capacity }}">
+
+                        <div class="card h-100 bg-black border-0 border-top border-4 shadow-sm room-card
+                            {% if not r.is_available %}border-danger{% elif r.is_locked_soon %}border-warning{% else %}border-success{% endif %}"
+                            onclick="handleRoomAction({{ r.id }} , '{{ r.name }}', {{ r.is_available|tojson }}, {{ r.is_locked_soon|tojson }}, '{{ r.next_booking_time }}')">
+
+                            <div class="position-relative" style="height: 140px;">
+                                <img src="{{ r.image }}" class="w-100 h-100 object-fit-cover {% if not r.is_available %}opacity-50{% endif %}">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-dark border border-warning text-warning">
+                                        {{ "{:,.0f}".format(r_price.price_per_hour) }}đ/h
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="fw-bold text-white mb-1">{{ r.name }}</h5>
+                                <p class="small text-secondary mb-3">{{ r_type.name }} • Max {{ r_type.max_capacity }} người</p>
+
+                                {% if not r.is_available %}
+                                    <div class="text-danger small fw-bold"><i class="fa-solid fa-circle-play me-1"></i> ĐANG HÁT</div>
+                                {% elif r.is_locked_soon %}
+                                    <div class="text-warning small fw-bold"><i class="fa-solid fa-clock me-1"></i> CÓ LỊCH: {{ r.next_booking_time }}</div>
+                                {% else %}
+                                    <div class="text-success small fw-bold"><i class="fa-solid fa-circle-check me-1"></i> SẴN SÀNG</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="quickBookModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Mở phòng: <span id="room_name_modal" class="text-info"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/cashier/quick-book" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="room_id" id="modal_room_id">
+                    <p class="text-secondary small">Mở phòng</p>
+                    <div class="mb-3">
+                        <label for="customer_name" class="form-label">Số khách</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" name="people">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="submit" class="btn btn-success w-100 fw-bold">XÁC NHẬN MỞ PHÒNG</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

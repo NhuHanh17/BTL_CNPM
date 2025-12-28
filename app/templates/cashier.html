@@ -1,0 +1,59 @@
+{% extends "layout/base_cashier.html" %}
+
+{% block content %}
+
+<div id="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: 300px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg flash-item" role="alert">
+            <i class="fa-solid fa-circle-info me-2"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
+{% if current_user.is_authenticated and current_user.type == UserRole.STAFF %}
+<div class="container-fluid mt-3">
+    <h5 class="text-primary fw-bold mb-3"><i class="fa-solid fa-bell me-2"></i>ĐƠN ĐẶT PHÒNG CHỜ DUYỆT</h5>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-5">
+        {% for b, cus in bookings %}
+        <div class="col">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold mb-0">Khách: {{ cus.fullname }} </h6>
+                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                    </div>
+
+                    <p class="small mb-1"><strong>SĐT:</strong> {{ cus.phone_number }}</p>
+                    <p class="small mb-1"><strong>Phòng:</strong> {{ b.room }}
+                    <p class="small mb-1"><strong>Giờ nhận:</strong> <span class="text-primary">{{ b.start_datetime.strftime('%H:%M %d/%m%y') }}</span></p>
+                    
+                    <hr class="my-2">
+                    
+                    <div class="d-flex gap-2">
+                        <a href="/cashier/approve/{{ b.id }}" class="btn btn-success btn-sm flex-fill">
+                            <i class="fa-solid fa-check me-1"></i>Duyệt
+                        </a>
+                        <a href="/cashier/reject/{{ b.id }}" class="btn btn-outline-danger btn-sm flex-fill">
+                            <i class="fa-solid fa-xmark me-1"></i>Hủy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-light border text-center text-muted">
+                Không có đơn đặt phòng nào đang chờ.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}

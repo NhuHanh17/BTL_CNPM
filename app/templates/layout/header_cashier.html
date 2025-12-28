@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary sticky-top py-2">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-danger fs-3" href="/">
+            <i class="fa-solid fa-microphone-lines me-2"></i>KARAOKE STAR
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navRes">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navRes">
+            <ul class="navbar-nav me-auto">
+                {% if current_user.is_authenticated and current_user.type == UserRole.STAFF %}
+                    <li class="nav-item"><a class="nav-link text-white-50" href="/cashier/rooms">Quản lý phòng</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50" href="/cashier/invoices">Hóa đơn</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link text-white-50" href="/">Trang chủ</a></li>
+                {% endif %}
+            </ul>
+            
+            <div class="navbar-nav align-items-center">
+                {% if current_user.is_authenticated and current_user.type == UserRole.STAFF %}
+                    <div class="d-flex align-items-center bg-dark rounded-pill px-3 py-1 me-3 border border-secondary">
+                        <img src="{{ current_user.avatar }}" class="rounded-circle me-2" width="28" height="28" style="object-fit: cover;">
+                        <span class="text-white small">Chào, <span class="fw-bold">{{ current_user.username }}</span></span>
+                    </div>
+                    <a class="nav-link fw-bold btn-logout-header" href="/logout">
+                        <i class="fa-solid fa-power-off me-1"></i> Thoát
+                    </a>
+                {% else %}
+                    <a class="nav-link text-white me-2" href="/admin">Đăng nhập</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

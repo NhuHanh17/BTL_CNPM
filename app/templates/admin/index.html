@@ -1,11 +1,122 @@
-{% extends 'admin/master.html'%}
+{% extends 'admin/master.html' %}
 
-{% block title %}
-    Admin Dashboard
-{% endblock%}
+{% block title %} Đăng nhập hệ thống {% endblock %}
+
+{% block head_css %}
+    {{ super() }} 
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block access_control %}
+    <ul class="nav navbar-nav navbar-right">
+        {% if current_user.is_authenticated and current_user.type == UserRole.ADMIN %}
+           <div class="admin-header-profile">
+                <img src="{{ current_user.avatar }}" class="admin-avatar" alt="User Avatar">
+                
+                <span class="admin-username ">Chào, {{ current_user.username }}</span>
+            </div>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+<div id="flash-messages" style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: 300px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg flash-item" role="alert">
+            <i class="fa-solid fa-circle-info me-2"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
 
 {% block body %}
-    {% if current_user.is_authenticated and current_user.type == 'Admin' %}
-    <h2> Chào Admin </h2>
+    {% if current_user.is_authenticated and current_user.type == UserRole.ADMIN %}
+        <div class="container mt-4">
+            <h2> Báo cáo thống kê ngày hôm nay </h2>   </div>
+<div class="row">
+    <div class="col-md-5 col-6">
+        <table class="table">
+            <tr>
+                <th>Phòng</th>
+                <th>Tổng doanh thu</th>
+            </tr>
+            {% for r, p in data %}
+            <tr>
+                <td>{{ r }}</td>
+                <td>{{ p  }}VND</td>
+
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="col-md-7 col-6">
+        <canvas id="myChart1"></canvas>
+    </div>
+</div>
+<hr />
+
+    {% else %}
+        <div class="login-container">
+            <form class="login-form" method="POST" action="/login"> <h2>ĐĂNG NHẬP</h2>
+                <div class="input-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" placeholder="Nhập username..." required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu..." required>
+                </div>
+
+                <button type="submit" class="login-btn">Đăng nhập</button>
+            </form>
+        </div>
     {% endif %}
-{% endblock%}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function drawChart(ctx, labels, data) {
+            new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: '# Doanh thu',
+                data: data,
+                borderWidth: 1,
+                backgroundColor: ['red', 'green', 'blue', 'gold', 'brown', 'pink']
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+    }
+window.onload = function() {
+
+    let labels = [];
+    let data = [];
+
+    {% for r, p in data %}
+    labels.push('{{r}}');
+    data.push({{p}});
+    {% endfor %}
+
+   const ctx1 = document.getElementById('myChart1');
+   drawChart(ctx1, labels, data);
+
+}
+
+</script>
+
+
+
+{% endblock %}

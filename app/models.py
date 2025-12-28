@@ -21,14 +21,12 @@ class UserRole(pyEnum):
     STAFF = "staff"
     CUSTOMER = "customer"
 
+
 class BookingStatus(pyEnum):
     PENDING = 'pending'
     CONFIRMED = 'confirmed'
+    COMPLETED = 'completed'
     CANCELLED = 'cancelled'
-
-class PaymentMethod(pyEnum):
-    CASH = 'cash'
-    BANKING = 'banking'    
 
 
 
@@ -69,12 +67,10 @@ class Customer(User):
     id = Column(Integer, ForeignKey('user.id',ondelete='CASCADE'), primary_key=True)
 
     fullname = Column (String(200), nullable=False)
-    phone_number = Column(String(200), nullable=False)
-
+    phone_number = Column(String(200), nullable=False, unique=True)
 
     bookings = relationship('Booking', backref='customer', lazy=True)
 
-    # cascade="all, delete-orphan" giúp Flask xóa MemberCard khi xóa Customer
     member_card = relationship('MemberCard', 
                                back_populates='customer', 
                                uselist=False, 
@@ -101,7 +97,6 @@ class Room(BaseModel):
     is_available = Column(Boolean, default=True)
     note =Column(String(250), nullable=True)
     image = Column(String(200), default='https://res.cloudinary.com/dinusoo6h/image/upload/v1766109939/Gemini_Generated_Image_j0d0nbj0d0nbj0d0_otxroh.png')
-    capacity = Column(Integer, default=1)
 
     bookings = relationship('Booking', backref='room', lazy=True)
     type_id = Column(Integer, ForeignKey(RoomType.id,ondelete='RESTRICT'), nullable=False)
@@ -123,7 +118,7 @@ class PriceConfig(BaseModel):
 
 class Booking(BaseModel):
     start_datetime = Column(DateTime, nullable=False)
-    end_datetime = Column(DateTime, nullable=False)
+    end_datetime = Column(DateTime, nullable=True)
     total_price = Column(Float, nullable=False)
     status = Column(Enum(BookingStatus), default=BookingStatus.PENDING)
     quantity = Column(Integer, default=1, nullable=False)
@@ -154,6 +149,7 @@ class ServicesItem(BaseModel):
     price = Column(Float, nullable=False)
     unit = Column(String(50))
     image = Column(String(200), default='https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=500&q=80')
+    capacity = Column(Integer, default=0, nullable=False)
 
     category_id = Column(Integer, ForeignKey(Category.id,ondelete='CASCADE'), nullable=False)
     services = relationship('InvoiceService',
@@ -169,8 +165,6 @@ class InvoiceService(BaseModel):
 
     invoice_id = Column(Integer, ForeignKey('invoice.id',ondelete='CASCADE'), primary_key=True)
     service_item_id = Column(Integer, ForeignKey('services_item.id',ondelete='CASCADE'), primary_key=True)
-
-    # Thiết lập relationship trỏ về 2 phía
     invoice = relationship("Invoice", back_populates="invoices")
     service_item = relationship("ServicesItem", back_populates="services")
 
@@ -182,6 +176,7 @@ class Invoice(CreatedAt):
     tax = Column(Float, default=0.05)
     total_price = Column(Float, default=0.0)
     is_cash = Column(Boolean, default=True)
+    is_paid = Column(Boolean, default=False)
 
     booking_id = Column(Integer, ForeignKey(Booking.id), nullable=False, unique=True)
     total_amount = Column(Float, default=0.0)
